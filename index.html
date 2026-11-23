@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 16 · Reading Full Test (2)</title>
+<style>
+:root{--lw:50%;--ink:#1d1d1f;--line:#d6d6d0;--soft:#f1f1ec;--blue:#1a5fb4;--ok:#1e8e3e;--no:#d93025;color-scheme:light}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#fff;color:var(--ink);font:16px/1.55 Arial,Helvetica,sans-serif}
+body{display:flex;flex-direction:column;overflow:hidden}
+button{font:inherit;cursor:pointer}
+/* header */
+header{height:54px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid var(--line);background:#fff;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;white-space:nowrap}
+.brand .tag{background:#c8102e;color:#fff;font-size:13px;letter-spacing:.06em;padding:4px 8px;border-radius:3px}
+.brand .tt{font-weight:400;color:#444}
+.clock{display:flex;align-items:center;gap:8px;font-weight:700;font-size:17px;font-variant-numeric:tabular-nums}
+.clock.warn{color:var(--no)}
+.who{color:#444;font-size:14px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:34vw}
+.scorebar{display:none;font-weight:700}
+body.review .clock{display:none}
+body.review .scorebar{display:flex;gap:14px;align-items:center}
+.scorebar .pill{background:#e8f0fe;color:var(--blue);border-radius:20px;padding:4px 12px}
+/* parts */
+main{flex:1;min-height:0;position:relative}
+.part{display:none;position:absolute;inset:0;flex-direction:column;padding:12px 16px 0}
+.part.on{display:flex}
+.phead{background:var(--soft);border:1px solid #e2e2dc;border-radius:6px;padding:10px 14px;font-size:15px;flex:none;margin-bottom:10px}
+.split{flex:1;min-height:0;display:flex}
+.pane{overflow:auto;min-height:0}
+.left{width:var(--lw);padding:6px 22px 40px 4px}
+.right{flex:1;padding:6px 8px 60px 22px}
+.divider{width:14px;flex:none;position:relative;cursor:col-resize;display:flex;align-items:center;justify-content:center}
+.divider:before{content:"";position:absolute;top:0;bottom:0;left:6px;width:2px;background:#9aa0a6}
+.divider svg{position:relative;background:#fff;border:1px solid #9aa0a6;border-radius:4px;padding:2px;width:26px;height:24px;color:#555}
+.ptitle{text-align:center;font-size:26px;margin:6px 0 16px}
+.passage p{margin:0 0 18px}
+.plab{margin-right:4px}
+.qs h3{font-size:16px;margin:22px 0 10px}
+.qs h3:first-child{margin-top:4px}
+.qs p{margin:0 0 10px}
+.tfk td{padding:3px 0;vertical-align:top}.tfk td:first-child{width:150px}
+.q{scroll-margin:80px}
+.qtext{margin:16px 0 6px!important}
+.opts{display:flex;flex-direction:column;gap:4px;margin-left:16px}
+.opt{display:flex;align-items:center;gap:10px;cursor:pointer;padding:3px 6px;border-radius:4px;width:max-content}
+.opt:hover{background:#f4f6f8}
+.opt input,.mc input{width:17px;height:17px;margin:0;accent-color:var(--blue);cursor:pointer}
+.notes h4,.summary h4{margin:16px 0 6px}
+.ctr{text-align:center;font-size:18px}
+.notes ul{margin:0;padding-left:22px}
+.notes li{margin:10px 0;line-height:2.4}
+.summary p{line-height:2.4}
+.gap{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;vertical-align:middle}
+.gin{width:170px;height:34px;border:1px solid #b9b9b3;border-radius:4px;padding:0 10px;font:inherit;text-align:center;background:#fff}
+.gin:focus{outline:2px solid var(--blue);outline-offset:0;border-color:var(--blue)}
+.gin::placeholder{color:#888;font-weight:700}
+.list{margin:6px 0 14px;padding:10px 14px;border:1px solid #e6e6e0;border-radius:6px;background:#fcfcfa}
+.list p{margin:4px 0}.list b{display:inline-block;width:24px}
+table.mx{border-collapse:collapse;margin:8px 0 18px;width:100%;max-width:980px}
+.mx th,.mx td{border:1px solid #dcdcd6;padding:7px 6px;text-align:center}
+.mx th{background:#fafaf7;font-size:14px;min-width:34px}
+.mx .mqh{text-align:center}
+.mx td.mq{text-align:left;padding:8px 10px}
+.mc{display:flex;justify-content:center;align-items:center;cursor:pointer;padding:3px}
+.mx tr:hover td{background:#f8f9fb}
+.sbox{border:1px solid #e2e2dc;border-radius:8px;padding:6px 18px 14px}
+.dz{display:inline-flex;align-items:center;gap:8px;min-width:190px;height:34px;border:1.5px dashed #b9b9b3;border-radius:5px;padding:0 10px;background:#fff;cursor:pointer;vertical-align:middle;line-height:1}
+.dz b{color:#555}
+.dz.filled{border-style:solid;border-color:#7aa7e0;background:#eef4fd}
+.dz.over{border-color:var(--blue);background:#e3edfb}
+.bank{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.chip{border:1px solid #c9c9c3;border-radius:5px;padding:7px 12px;background:#fff;cursor:grab;user-select:none;line-height:1.2}
+.chip.sel{outline:2px solid var(--blue);background:#eef4fd}
+.chip.used{display:none}
+/* review marks + locate */
+.mk,.loc{display:none}
+body.review .mk{display:inline-block;font-weight:700;font-size:17px;margin:0 2px 0 4px;min-width:14px}
+.mk.ok{color:var(--ok)}.mk.no{color:var(--no)}
+body.review .loc{display:inline-flex;align-items:center;justify-content:center;border:1px solid #c6dafc;background:#eef4fd;color:var(--blue);border-radius:50%;width:28px;height:28px;padding:0;vertical-align:middle;margin-left:2px}
+body.review .loc:hover{background:var(--blue);color:#fff}
+body.review .gin.ok{border-color:var(--ok);background:#f1faf3}
+body.review .gin.no{border-color:var(--no);background:#fdf3f2}
+body.review .dz.ok{border-color:var(--ok);background:#f1faf3}
+body.review .dz.no{border-color:var(--no);background:#fdf3f2}
+body.review .chip{display:none}
+body.review .opt,body.review .mc{pointer-events:none}
+body.review .opt:has(input:checked) span{font-weight:700}
+.q.locating .qtext,.q.locating td.mq,.gap.locating .gin,.gap.locating .dz{box-shadow:0 0 0 3px #ffb74d}
+/* highlights */
+mark.hl{background:#fff176;color:inherit;cursor:pointer;padding:0}
+mark.ev{background:#ffd8a8;color:inherit;border-bottom:2px solid #f57c00;padding:1px 0}
+mark.ev.flash{animation:fl 1.6s ease 2}
+@keyframes fl{0%,100%{background:#ffd8a8}50%{background:#ffb74d}}
+#hlmenu{position:fixed;z-index:60;display:none;background:#fff;border:1px solid #cfcfca;border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.15);overflow:hidden}
+#hlmenu button{border:0;background:#fff;padding:7px 14px;font-size:14px;display:flex;align-items:center;gap:6px}
+#hlmenu button:hover{background:#f1f3f4}
+#hlmenu .sw{width:14px;height:14px;background:#fff176;border:1px solid #d4c64a;border-radius:3px}
+/* footer nav */
+footer{flex:none;height:60px;border-top:1px solid var(--line);display:flex;align-items:center;padding:0 12px;gap:6px;background:#fff}
+.navparts{flex:1;display:flex;align-items:center;gap:6px;overflow-x:auto;min-width:0}
+.np{display:flex;align-items:center;gap:4px;padding:6px 10px;border-radius:6px;cursor:pointer;white-space:nowrap;font-size:15px}
+.np:not(.on):hover{background:#f4f4f1}
+.np .lab{font-weight:700;margin-right:6px}
+.np .cnt{color:#666}
+.np.on{cursor:default;background:#f7f7f4}
+.qb{width:30px;height:30px;border:1px solid #cfcfca;background:#fff;border-radius:4px;font-size:13px;padding:0;position:relative}
+.qb.ans{border-bottom:3px solid #222}
+.qb.cur{outline:2px solid var(--blue)}
+body.review .qb.ok{background:#e6f4ea;border-color:#81c995;color:#0d652d}
+body.review .qb.no{background:#fce8e6;border-color:#f28b82;color:#a50e0e}
+.arrows{display:flex;gap:6px}
+.ib{width:42px;height:42px;border-radius:6px;border:1px solid #cfcfca;background:#fff;display:flex;align-items:center;justify-content:center}
+.ib:hover{background:#f4f4f1}
+.subbtn{height:42px;border-radius:6px;border:0;background:#1d1d1f;color:#fff;padding:0 18px;display:flex;align-items:center;gap:8px;font-weight:700}
+.subbtn:hover{background:#000}
+body.review .subbtn{display:none}
+/* overlays */
+.ov{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;background:rgba(30,30,32,.55);padding:20px}
+.ov.on{display:flex}
+#start.ov{background:#f4f4f0}
+.card{background:#fff;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.18);padding:28px 32px;max-width:640px;width:100%;max-height:92vh;overflow:auto}
+.card h1{font-size:24px;margin:0 0 4px}
+.card .sub{color:#555;margin:0 0 18px}
+.fld{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.fld label{font-weight:700;font-size:14px}
+.fld input{height:42px;border:1px solid #bbb;border-radius:6px;padding:0 12px;font:inherit}
+.fld input[readonly]{background:#f3f3f0;color:#333}
+.rules{background:#fafaf7;border:1px solid #e6e6e0;border-radius:8px;padding:12px 16px 12px 34px;margin:14px 0 18px;font-size:15px}
+.rules li{margin:4px 0}
+.big{width:100%;height:48px;border:0;border-radius:8px;background:#1a5fb4;color:#fff;font-weight:700;font-size:17px}
+.big:hover{background:#174ea6}
+.big.gray{background:#e8eaed;color:#222}
+.err{color:var(--no);font-size:14px;min-height:20px}
+.row2{display:flex;gap:10px}.row2 .big{flex:1}
+.warnbox{max-width:520px;text-align:center}
+.warnbox .wi{width:64px;height:64px;margin:0 auto 10px;color:#e37400}
+.warnbox p{font-size:19px;font-weight:700;margin:6px 0 20px}
+.res .score{font-size:56px;font-weight:700;text-align:center;line-height:1.1;margin:8px 0 0}
+.res .band{text-align:center;font-size:18px;color:#444;margin-bottom:14px}
+.res .pp{display:flex;gap:10px;margin:10px 0 14px}
+.res .pp div{flex:1;background:#f6f7f9;border-radius:8px;padding:10px;text-align:center;font-size:14px}
+.res .pp b{display:block;font-size:20px}
+.res .note{background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:10px 14px;font-size:15px;margin-bottom:14px}
+.sendst{font-size:14px;text-align:center;margin:0 0 12px;color:#555}
+.sendst.ok{color:var(--ok)}.sendst.bad{color:var(--no)}
+.sendst button{border:1px solid #ccc;background:#fff;border-radius:4px;padding:2px 10px;margin-left:6px}
+#toast{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);background:#323232;color:#fff;padding:8px 16px;border-radius:6px;font-size:14px;z-index:90;display:none}
+@media (max-width:820px){
+  .split{flex-direction:column}.left{width:auto;height:48%;padding-right:4px;border-bottom:2px solid #9aa0a6}.divider{display:none}.right{padding-left:4px}
+  .brand .tt{display:none}.gin{width:130px}.dz{min-width:150px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><span class="tag">IELTS</span><span>Reading</span><span class="tt">· Week 16 · Full Test (2)</span></div>
+  <div class="clock" id="clock"><svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 9v4l3 2M9 3h6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg><span id="tleft">60:00</span></div>
+  <div class="scorebar"><span class="pill" id="sbScore"></span><span id="sbBand"></span></div>
+  <div class="who" id="who"></div>
+</header>
+<main>
+<section class="part" id="part1" data-part="1">
+<div class="phead"><b>Part 1</b><br>Answer questions 1-13.</div>
+<div class="split"><div class="pane left"><div class="passage hl-zone"><h2 class="ptitle">The Importance of Business Cards</h2>
+<p>The ritual may be universal, but the details of business cards and how they are swapped vary across countries. Americans throw their cards casually across a table; the Japanese make the exchange of cards a formal ceremony. While there are cards that are discreet and understated, others are crammed full of details and titles. Some businesspeople hand out 24-carat gold cards, and there are kindergarten children who have cards with not only their own contact details, but also with the job descriptions of their parents and even grandparents. This practice has become so common in parts of New York, for example, that the use of such cards is now prohibited by some of these institutions.</p>
+<p>Cards have been around a long time in one form or another. The Chinese invented calling cards in the 15th century to give people notice that they intended to pay them a visit, but these were for social purposes only. Then, in the 17th century, European businesspeople invented a new type of card to act as miniature advertisements, signalling the advent of the business card. In today&#x27;s world, business cards can cause people to have strong emotional reactions. According to one experienced company director, very few things can provoke more heated discussion at a board meeting than the composition of the company&#x27;s business cards.</p>
+<p>Lots of companies try to promote themselves by altering the form of the card. Employees at one famous toy company give out little plastic figures with their contact details stamped on them. One fast food company has business cards which are shaped like a portion of French fries. A Canadian divorce lawyer once gave out cards that could be torn in two – one half for each of the spouses. For many business commentators, such gimmicky business cards prove that the use of a physical business card is nearly at an end. After all, why bother exchanging bits of thick paper at all when you can simply swap electronic versions by smartphone.</p>
+<p>However, one can just as well argue the opposite: that business cards are here to stay, and in a business world full of meetings and correspondence, it is more important than ever that your card is unique. Attempts to reinvent business cards for the digital age have not been successful. Even at the latest technology conferences, people still greet each other by handing out little rectangles made from paper rather than using a digital alternative.</p>
+<p>To understand business cards, it is necessary to understand how business works. That business cards are thriving in a digital age is a forceful reminder that there is much about business that is timeless. According to Kate Jones, a business lecturer, there is one eternal and inescapable issue. Her 2006 study of more than 200 business executives in North America found that trust was the key element for running a successful business. It is vital to be able to look someone in the eye and decide what sort of person they are. In this way, you can transform acquaintanceships into relationships. A good proportion of business life will always be about building social connections – having dinner or playing sport with clients and colleagues – and while computers can deal with administrative tasks, it is still human beings that have to focus on the emotional.</p>
+<p>The rapid advance of globalisation means that this relationship building process is becoming ever more demanding. Managers have to put more effort in when dealing with international counterparts, especially when there is not a common language, which is so often the case these days. A recent UK survey showed that chief executives of global organisations now routinely spend three out of every four weeks on international travel. It is in these situations that business cards are doubly useful, as they are a quick way of establishing connections. Cards can also remind you that you have actually met someone in a face-to-face meeting rather than just searched for them on the internet. Looking through piles of different cards can enhance your memory in ways that simply looking through uniform electronic lists would never do.</p>
+<p>Janet McIntyre is a leading expert on business cards in today&#x27;s world. She maintains that as companies become more complex, cards are essential in determining the exact status of every contact you meet in multinational corporations. Janet also explains how exchanging business cards can be an effective way of initiating a conversation, because it gives people a ritual to follow when they first meet a new business contact.</p>
+<p>The business world is obsessed with the idea of creating and inventing new things that will change the way we do everything, and this does lead to progress. But there are lots of things that do not need to be changed and in Janet McIntyre&#x27;s view, tradition also has an equally valuable role to play. Therefore the practice of exchanging business cards is likely to continue in the business world.</p></div></div>
+<div class="divider" title="Kéo để đổi độ rộng"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg></div>
+<div class="pane right"><div class="qs"><h3>Questions 1-5</h3>
+<p>Do the following statements agree with the information given in Reading Passage 1?</p>
+<p>In boxes 1-5 on your answer sheet, write</p>
+<table class="tfk"><tr><td><b>TRUE</b></td><td>if the statement agrees with the information</td></tr>
+<tr><td><b>FALSE</b></td><td>if the statement contradicts the information</td></tr>
+<tr><td><b>NOT GIVEN</b></td><td>if there is no information on this</td></tr></table><div class="q" id="q1" data-q="1"><p class="qtext hl-zone"><b>1</b> Children&#x27;s business cards have been banned in some kindergartens. <span class="mk" data-q="1"></span><button class="loc" data-q="1" title="Xem thông tin trong bài đọc" aria-label="Locate 1"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></p><div class="opts"><label class="opt"><input type="radio" name="q1" value="TRUE"><span>True</span></label><label class="opt"><input type="radio" name="q1" value="FALSE"><span>False</span></label><label class="opt"><input type="radio" name="q1" value="NOT GIVEN"><span>Not Given</span></label></div></div><div class="q" id="q2" data-q="2"><p class="qtext hl-zone"><b>2</b> It was the Chinese who first began the practice of using business cards. <span class="mk" data-q="2"></span><button class="loc" data-q="2" title="Xem thông tin trong bài đọc" aria-label="Locate 2"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></p><div class="opts"><label class="opt"><input type="radio" name="q2" value="TRUE"><span>True</span></label><label class="opt"><input type="radio" name="q2" value="FALSE"><span>False</span></label><label class="opt"><input type="radio" name="q2" value="NOT GIVEN"><span>Not Given</span></label></div></div><div class="q" id="q3" data-q="3"><p class="qtext hl-zone"><b>3</b> Designing business cards can be a controversial process for some companies. <span class="mk" data-q="3"></span><button class="loc" data-q="3" title="Xem thông tin trong bài đọc" aria-label="Locate 3"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></p><div class="opts"><label class="opt"><input type="radio" name="q3" value="TRUE"><span>True</span></label><label class="opt"><input type="radio" name="q3" value="FALSE"><span>False</span></label><label class="opt"><input type="radio" name="q3" value="NOT GIVEN"><span>Not Given</span></label></div></div><div class="q" id="q4" data-q="4"><p class="qtext hl-zone"><b>4</b> A famous toy company has boosted their sales by using one type of unusual business card. <span class="mk" data-q="4"></span><button class="loc" data-q="4" title="Xem thông tin trong bài đọc" aria-label="Locate 4"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></p><div class="opts"><label class="opt"><input type="radio" name="q4" value="TRUE"><span>True</span></label><label class="opt"><input type="radio" name="q4" value="FALSE"><span>False</span></label><label class="opt"><input type="radio" name="q4" value="NOT GIVEN"><span>Not Given</span></label></div></div><div class="q" id="q5" data-q="5"><p class="qtext hl-zone"><b>5</b> Some business commentators predict a decline in the use of paper business cards. <span class="mk" data-q="5"></span><button class="loc" data-q="5" title="Xem thông tin trong bài đọc" aria-label="Locate 5"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></p><div class="opts"><label class="opt"><input type="radio" name="q5" value="TRUE"><span>True</span></label><label class="opt"><input type="radio" name="q5" value="FALSE"><span>False</span></label><label class="opt"><input type="radio" name="q5" value="NOT GIVEN"><span>Not Given</span></label></div></div><h3>Questions 6-13</h3>
+<p>Complete the notes below.</p>
+<p>Choose <b>ONE WORD ONLY</b> from the passage for each answer.</p>
+<p>Write your answers in boxes <b>6-13</b> on your answer sheet.</p>
+<div class="notes hl-zone">
+<h4 class="ctr">How business works</h4>
+<h4>Kate Jones's research</h4>
+<ul>
+<li>The most important aspect of business is having <span class="gap" id="q6" data-q="6"><input type="text" class="gin" data-q="6" placeholder="6" autocomplete="off" spellcheck="false"><span class="mk" data-q="6"></span><button class="loc" data-q="6" title="Xem thông tin trong bài đọc" aria-label="Locate 6"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></span> in others.</li>
+<li><span class="gap" id="q7" data-q="7"><input type="text" class="gin" data-q="7" placeholder="7" autocomplete="off" spellcheck="false"><span class="mk" data-q="7"></span><button class="loc" data-q="7" title="Xem thông tin trong bài đọc" aria-label="Locate 7"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></span> do not have the ability to establish the good relationships essential to business.</li>
+</ul>
+<h4>Business and globalisation</h4>
+<ul>
+<li>Managers must work harder when they don't share the same <span class="gap" id="q8" data-q="8"><input type="text" class="gin" data-q="8" placeholder="8" autocomplete="off" spellcheck="false"><span class="mk" data-q="8"></span><button class="loc" data-q="8" title="Xem thông tin trong bài đọc" aria-label="Locate 8"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></span> with their contacts.</li>
+<li>A UK survey indicates that <span class="gap" id="q9" data-q="9"><input type="text" class="gin" data-q="9" placeholder="9" autocomplete="off" spellcheck="false"><span class="mk" data-q="9"></span><button class="loc" data-q="9" title="Xem thông tin trong bài đọc" aria-label="Locate 9"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></span> takes up the largest part of business leaders' time.</li>
+<li>A business person's <span class="gap" id="q10" data-q="10"><input type="text" class="gin" data-q="10" placeholder="10" autocomplete="off" spellcheck="false"><span class="mk" data-q="10"></span><button class="loc" data-q="10" title="Xem thông tin trong bài đọc" aria-label="Locate 10"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></span> of a meeting can be improved by looking at business cards.</li>
+</ul>
+<h4>Janet McIntyre</h4>
+<ul>
+<li>Business cards clearly show the <span class="gap" id="q11" data-q="11"><input type="text" class="gin" data-q="11" placeholder="11" autocomplete="off" spellcheck="false"><span class="mk" data-q="11"></span><button class="loc" data-q="11" title="Xem thông tin trong bài đọc" aria-label="Locate 11"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></span> of each person in a large company.</li>
+<li>The ritual of swapping business cards is a good way of starting a <span class="gap" id="q12" data-q="12"><input type="text" class="gin" data-q="12" placeholder="12" autocomplete="off" spellcheck="false"><span class="mk" data-q="12"></span><button class="loc" data-q="12" title="Xem thông tin trong bài đọc" aria-label="Locate 12"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></span> at the beginning of a business relationship.</li>
+<li>Janet feels that in the business world, <span class="gap" id="q13" data-q="13"><input type="text" class="gin" data-q="13" placeholder="13" autocomplete="off" spellcheck="false"><span class="mk" data-q="13"></span><button class="loc" data-q="13" title="Xem thông tin trong bài đọc" aria-label="Locate 13"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></span> is just as important as innovation.</li>
+</ul></div></div></div></div></section><section class="part" id="part2" data-part="2">
+<div class="phead"><b>Part 2</b><br>Answer questions 14-26.</div>
+<div class="split"><div class="pane left"><div class="passage hl-zone"><h2 class="ptitle">Boring buildings</h2>
+<p class="intro"><i>There could be more than an economic or nostalgic price to impersonal retail and high-rise construction; boring architecture may take an emotional toll on the people forced to live with it.</i></p>
+<p><b class="plab">A</b> A growing body of research in cognitive science illuminates the physical and mental toll bland cityscapes take on residents. Generally, these researchers argue that humans are healthier when they live surrounded by variety or work in well-designed, unique spaces, rather than unattractive, generic ones. Urban policy professor Justin Hollander and architect Ann Sussman review scientific data to help architects and urban planners understand how, exactly, people respond to their built surroundings, particularly at work. People, they argue, function best in intricate settings, not &#x27;big, blank, boxy offices&#x27;.</p>
+<p><b class="plab">B</b> Indeed, that&#x27;s what Colin Ellard, a neuroscientist at the University of Waterloo in Canada, has found in his work. Five years ago, Ellard became interested in a certain building – the gigantic Whole Foods Market &#x27;plopped into&#x27; a notoriously textured part of lower Manhattan in New York. Ellard partnered with the Guggenheim Museum to analyze what happens when someone walks out of a tiny neighborhood restaurant and encounters a full city block with nothing but &#x27;the long, blank facade of the Whole Foods Market&#x27; building. In 2011, Ellard led small groups on Lower East Side walks to measure the effect of the urban environment on them. Participants recorded their response to questions at each stopping point and wore sensors that measured skin conductance, a response to emotional excitement. Passing the monolithic Whole Foods Market, people&#x27;s state of arousal plummeted. Physiologically, Ellard explained, they were bored. To describe this place, they used words like &#x27;bland&#x27; and &#x27;passionless&#x27;. In contrast, one block east at the other test site – a &#x27;lively sea of restaurants with lots of open doors and windows&#x27; – people measured high levels of excitement, and they listed words like &#x27;lively&#x27;, and &#x27;socializing&#x27;. Ellard explains that the main objective of urban design should be to produce some kind of novelty or change every few seconds; otherwise, we become cognitively disengaged.</p>
+<p><b class="plab">C</b> The trick, it seems, is to design a world that excites but doesn&#x27;t overload our faculties with a constant barrage of information. &#x27;We are, as animals, programmed to respond to thrill,&#x27; said professor Brendan Walker. In Walker&#x27;s &#x27;thrill laboratory&#x27; at the University of Nottingham in the UK, devices measure heart rate and skin conductance to see how people respond to adrenaline-producing experiences such as a roller-coaster ride. A thrilling encounter moves us quickly from a state of equilibrium to a desirable &#x27;disorientation&#x27;. &#x27;Humans want a certain element of turmoil or confusion,&#x27; he said. &#x27;Complexity is thrilling whether in an amusement park or architecture.&#x27;</p>
+<p><b class="plab">D</b> Psychologists have found that awe-inspiring moments can potentially improve our well-being. One study conducted by Melanie Rudd, Kathleen Vohs and Jennifer Aaker of Stanford University in the US showed that the feeling of &#x27;awe&#x27; can make people more patient and less materialistic. In an experiment, the researchers showed students 60-second clips of waterfalls, whales, or astronauts in space. After only a minute of virtual images, those who said they were awed also felt less pressed for time. And in another variation, people made hypothetical choices between physical and experiential goods of equal monetary value. Those who had just &#x27;felt awe&#x27; were more likely to choose an experience over a possession, a choice that is linked with greater satisfaction in the long run. In other words, a visual buzz – whether architectural or natural – might have the ability to change our frame of mind, making modern-day life more satisfying and interactive.</p>
+<p><b class="plab">E</b> It&#x27;s important to note, however, that architectural boredom isn&#x27;t about how pristine a street is. People often confuse successful architecture with whether an area looks pleasant. On the contrary, when it comes to city buildings, people often focus too narrowly on aesthetics, said Charles Montgomery, author of Happy City: Transforming Our Lives Through Urban Design. Some of the happiest blocks in New York City, he argues, are &#x27;kind of ugly and messy&#x27;. In 2014, Montgomery&#x27;s Happy City lab conducted an experiment in which he found a strong correlation between messier blocks and pro-social behavior. Montgomery sent researchers, posing as lost tourists, to places he coded as either &#x27;active&#x27; or &#x27;inactive&#x27; facades. He concluded that the former had a high level of interest, that is they were messy, while the latter had no special features such as long warehouse blocks. Pedestrians at active sites were nearly five times more likely to offer assistance than at inactive ones. Of those who assisted, seven times as many at the active site offered use of their phone.</p>
+<p><b class="plab">F</b> Fortunately, it&#x27;s not necessarily a dichotomy - new architecture can achieve the optimal level of cacophony and beauty. Take the 2006 Hearst Tower in midtown Manhattan. Designed by architect Norman Foster, Hearst Tower is a glass-and-steel skyscraper, 40 stories of which are designed in a triangular pattern, differing in style from the 1920s Art Deco base. From the outside, the facade jolts city dwellers from their daily commutes, while energizing employees who enter it each morning. For many who walk by, Hearst Tower&#x27;s design may not be the easiest to understand; it&#x27;s both sleek and old. The top looks like it traveled from the future. Inside, workers travel upon diagonal escalators, up a three-story water sculpture, through the tower&#x27;s historic atrium, flooded with light. Few New Yorkers who pass by would find this building boring. And they&#x27;re likely to be happier – maybe even nicer to each other – because of it.</p></div></div>
+<div class="divider" title="Kéo để đổi độ rộng"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg></div>
+<div class="pane right"><div class="qs"><h3>Questions 14-18</h3>
+<p>Reading Passage 2 has six sections, <b>A-F</b>.</p>
+<p>Which section contains the following information?</p>
+<p>Write the correct letter, <b>A-F</b>, in boxes <b>14-18</b> on your answer sheet.</p>
+<table class="mx"><thead><tr><th class="mqh">Question</th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th></tr></thead><tbody><tr class="q" id="q14" data-q="14"><td class="mq hl-zone"><b>14</b> a description of a building that has a positive effect <span class="mk" data-q="14"></span><button class="loc" data-q="14" title="Xem thông tin trong bài đọc" aria-label="Locate 14"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></td><td><label class="mc"><input type="radio" name="q14" value="A"><span></span></label></td><td><label class="mc"><input type="radio" name="q14" value="B"><span></span></label></td><td><label class="mc"><input type="radio" name="q14" value="C"><span></span></label></td><td><label class="mc"><input type="radio" name="q14" value="D"><span></span></label></td><td><label class="mc"><input type="radio" name="q14" value="E"><span></span></label></td><td><label class="mc"><input type="radio" name="q14" value="F"><span></span></label></td></tr><tr class="q" id="q15" data-q="15"><td class="mq hl-zone"><b>15</b> a reference to architecture affecting people&#x27;s performance in their jobs <span class="mk" data-q="15"></span><button class="loc" data-q="15" title="Xem thông tin trong bài đọc" aria-label="Locate 15"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></td><td><label class="mc"><input type="radio" name="q15" value="A"><span></span></label></td><td><label class="mc"><input type="radio" name="q15" value="B"><span></span></label></td><td><label class="mc"><input type="radio" name="q15" value="C"><span></span></label></td><td><label class="mc"><input type="radio" name="q15" value="D"><span></span></label></td><td><label class="mc"><input type="radio" name="q15" value="E"><span></span></label></td><td><label class="mc"><input type="radio" name="q15" value="F"><span></span></label></td></tr><tr class="q" id="q16" data-q="16"><td class="mq hl-zone"><b>16</b> examples of the intensity of people&#x27;s reactions in two urban settings <span class="mk" data-q="16"></span><button class="loc" data-q="16" title="Xem thông tin trong bài đọc" aria-label="Locate 16"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></td><td><label class="mc"><input type="radio" name="q16" value="A"><span></span></label></td><td><label class="mc"><input type="radio" name="q16" value="B"><span></span></label></td><td><label class="mc"><input type="radio" name="q16" value="C"><span></span></label></td><td><label class="mc"><input type="radio" name="q16" value="D"><span></span></label></td><td><label class="mc"><input type="radio" name="q16" value="E"><span></span></label></td><td><label class="mc"><input type="radio" name="q16" value="F"><span></span></label></td></tr><tr class="q" id="q17" data-q="17"><td class="mq hl-zone"><b>17</b> details of a study where seeing certain pictures reduced people&#x27;s stress <span class="mk" data-q="17"></span><button class="loc" data-q="17" title="Xem thông tin trong bài đọc" aria-label="Locate 17"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></td><td><label class="mc"><input type="radio" name="q17" value="A"><span></span></label></td><td><label class="mc"><input type="radio" name="q17" value="B"><span></span></label></td><td><label class="mc"><input type="radio" name="q17" value="C"><span></span></label></td><td><label class="mc"><input type="radio" name="q17" value="D"><span></span></label></td><td><label class="mc"><input type="radio" name="q17" value="E"><span></span></label></td><td><label class="mc"><input type="radio" name="q17" value="F"><span></span></label></td></tr><tr class="q" id="q18" data-q="18"><td class="mq hl-zone"><b>18</b> a claim about feelings experienced in response to both architecture and leisure settings <span class="mk" data-q="18"></span><button class="loc" data-q="18" title="Xem thông tin trong bài đọc" aria-label="Locate 18"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></td><td><label class="mc"><input type="radio" name="q18" value="A"><span></span></label></td><td><label class="mc"><input type="radio" name="q18" value="B"><span></span></label></td><td><label class="mc"><input type="radio" name="q18" value="C"><span></span></label></td><td><label class="mc"><input type="radio" name="q18" value="D"><span></span></label></td><td><label class="mc"><input type="radio" name="q18" value="E"><span></span></label></td><td><label class="mc"><input type="radio" name="q18" value="F"><span></span></label></td></tr></tbody></table>
+<h3>Questions 19-23</h3>
+<p>Look at the following statements (Questions <b>19-23</b>) and the list of researchers below.</p>
+<p>Match each statement with the correct researcher, <b>A, B, C</b> or <b>D</b>.</p>
+<p>Write the correct letter, <b>A, B, C</b> or <b>D</b>, in boxes <b>19-23</b> on your answer sheet.</p>
+<p><b>NB</b>&nbsp;&nbsp; You may use any letter more than once.</p>
+<div class="list hl-zone"><p class="lh"><b>List of Researchers</b></p>
+<p><b>A</b> Colin Ellard</p><p><b>B</b> Brendan Walker</p><p><b>C</b> Rudd, Vohs and Aaker</p><p><b>D</b> Charles Montgomery</p></div>
+<table class="mx"><thead><tr><th class="mqh">Question</th><th>A</th><th>B</th><th>C</th><th>D</th></tr></thead><tbody><tr class="q" id="q19" data-q="19"><td class="mq hl-zone"><b>19</b> The aim of good city planning is to provide variety in architecture. <span class="mk" data-q="19"></span><button class="loc" data-q="19" title="Xem thông tin trong bài đọc" aria-label="Locate 19"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></td><td><label class="mc"><input type="radio" name="q19" value="A"><span></span></label></td><td><label class="mc"><input type="radio" name="q19" value="B"><span></span></label></td><td><label class="mc"><input type="radio" name="q19" value="C"><span></span></label></td><td><label class="mc"><input type="radio" name="q19" value="D"><span></span></label></td></tr><tr class="q" id="q20" data-q="20"><td class="mq hl-zone"><b>20</b> People in untidy areas were more helpful. <span class="mk" data-q="20"></span><button class="loc" data-q="20" title="Xem thông tin trong bài đọc" aria-label="Locate 20"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></td><td><label class="mc"><input type="radio" name="q20" value="A"><span></span></label></td><td><label class="mc"><input type="radio" name="q20" value="B"><span></span></label></td><td><label class="mc"><input type="radio" name="q20" value="C"><span></span></label></td><td><label class="mc"><input type="radio" name="q20" value="D"><span></span></label></td></tr><tr class="q" id="q21" data-q="21"><td class="mq hl-zone"><b>21</b> People who had recently felt amazed, placed less importance on material goods. <span class="mk" data-q="21"></span><button class="loc" data-q="21" title="Xem thông tin trong bài đọc" aria-label="Locate 21"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></td><td><label class="mc"><input type="radio" name="q21" value="A"><span></span></label></td><td><label class="mc"><input type="radio" name="q21" value="B"><span></span></label></td><td><label class="mc"><input type="radio" name="q21" value="C"><span></span></label></td><td><label class="mc"><input type="radio" name="q21" value="D"><span></span></label></td></tr><tr class="q" id="q22" data-q="22"><td class="mq hl-zone"><b>22</b> &#x27;Attractive&#x27; places are not necessarily the most enjoyable places to be. <span class="mk" data-q="22"></span><button class="loc" data-q="22" title="Xem thông tin trong bài đọc" aria-label="Locate 22"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></td><td><label class="mc"><input type="radio" name="q22" value="A"><span></span></label></td><td><label class="mc"><input type="radio" name="q22" value="B"><span></span></label></td><td><label class="mc"><input type="radio" name="q22" value="C"><span></span></label></td><td><label class="mc"><input type="radio" name="q22" value="D"><span></span></label></td></tr><tr class="q" id="q23" data-q="23"><td class="mq hl-zone"><b>23</b> One particular building failed to provide visual stimulation. <span class="mk" data-q="23"></span><button class="loc" data-q="23" title="Xem thông tin trong bài đọc" aria-label="Locate 23"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></td><td><label class="mc"><input type="radio" name="q23" value="A"><span></span></label></td><td><label class="mc"><input type="radio" name="q23" value="B"><span></span></label></td><td><label class="mc"><input type="radio" name="q23" value="C"><span></span></label></td><td><label class="mc"><input type="radio" name="q23" value="D"><span></span></label></td></tr></tbody></table>
+<h3>Questions 24-26</h3>
+<p>Complete the summary below.</p>
+<p>Choose <b>ONE WORD ONLY</b> from the passage for each answer.</p>
+<p>Write your answers in boxes <b>24-26</b> on your answer sheet.</p>
+<div class="summary hl-zone"><h4 class="ctr">Hearst Tower</h4>
+<p>Norman Foster's Hearst Tower was built in 2006. The 40-storey modern triangular patterned building is made of glass and steel, contrasting with the base which is in the style of the 1920s. The sight of the building's <span class="gap" id="q24" data-q="24"><input type="text" class="gin" data-q="24" placeholder="24" autocomplete="off" spellcheck="false"><span class="mk" data-q="24"></span><button class="loc" data-q="24" title="Xem thông tin trong bài đọc" aria-label="Locate 24"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></span> has a striking impact on commuters and employees. Some passers-by may find the building's design confusing, as it mixes old and new elements. Inside the tower, <span class="gap" id="q25" data-q="25"><input type="text" class="gin" data-q="25" placeholder="25" autocomplete="off" spellcheck="false"><span class="mk" data-q="25"></span><button class="loc" data-q="25" title="Xem thông tin trong bài đọc" aria-label="Locate 25"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></span> carry employees up past a large water sculpture in the light-filled <span class="gap" id="q26" data-q="26"><input type="text" class="gin" data-q="26" placeholder="26" autocomplete="off" spellcheck="false"><span class="mk" data-q="26"></span><button class="loc" data-q="26" title="Xem thông tin trong bài đọc" aria-label="Locate 26"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></span>.</p></div></div></div></div></section><section class="part" id="part3" data-part="3">
+<div class="phead"><b>Part 3</b><br>Answer questions 27-40.</div>
+<div class="split"><div class="pane left"><div class="passage hl-zone"><h2 class="ptitle">THEORIES OF PLANET FORMATION QUESTIONED</h2>
+<p><b class="plab">A</b> The traditional view of astronomy has been that planets form slowly as material congeals within the disk of gas, dust and ice known to surround young stars. First, gravity gathers together bits of dust that merge to form boulder-sized bodies, which themselves coalesce into bigger and bigger objects. In about a million years, these form rocky planets like Earth and Mars. Over the next few million years, gas from the disk settles around some of these solid bodies and they grow far larger, becoming giants like gaseous Saturn and Jupiter. This theory of planet formation is known as the core-accretion mode. However, several astronomers now say that this model for making planets may not be entirely correct.</p>
+<p><b class="plab">B</b> These astronomers have devised an alternative theory in which planets as massive as Jupiter, whether orbiting our sun or a distant star, would form completely within a few hundred years, rather than millions of years as previously believed. Both theories for planet formation start with the same reservoir of planet-making materials. The spinning cloud of gas, dust and ice rapidly flattens into disk-like shapes known as proto-planetary disks; and, as time goes by, gravity causes material in these disks to clump into planet-sized objects. However, it is the speed of the clustering, and the size of the initial clumps, that provide the disparity in the two models for planet formation.</p>
+<p><b class="plab">C</b> According to the core-accretion model, the making of Jupiter required the initial formation of a solid core five to ten times Earth&#x27;s mass. It would have taken about a million years to achieve this. Most astronomers believe that the large core then had enough gravity to attract a huge amount of gas from the proto-planetary disk to create a planet of the massive proportions of Jupiter. In this core-accretion mode, these &#x27;gas giants&#x27; may take as long as ten million years to form.</p>
+<p><b class="plab">D</b> That is several million years too long in the opinion of Lucio Mayer of Zurich University. Direct telescope sightings suggest that the proto-planetary disks do not last more than about seven million years, and studies of the environment in which stars form suggest that many disks may evaporate in much less time. Mayer asserts that most stars in the Milky Way form in dense clouds of gas, dust and ice. Their temperatures are very intense and the ultraviolet light they send into space can evaporate a proto-planetary disk in less than 100,000 years. In the core-accretion model, that is enough time for a Jupiter-like planet to form.</p>
+<p><b class="plab">E</b> Recent computer simulations show that when individual stars form, the gravitational pull between them can result in the outer gaseous parts of the proto-planetary disks being destroyed in 100,000 years or less. Thus, Thomas Quinn of the University of Washington concludes that if a &#x27;gas giant&#x27; planet cannot form quickly, it will probably never form. He also asserts that if the core-accretion model is correct, &#x27;gas giant&#x27; planets like Jupiter should be rare. However, since 1995, astronomers have found more than one hundred planets as large as Jupiter outside our solar system.</p>
+<p><b class="plab">F</b> Quinn and his colleagues recently analysed the standard core-accretion model of planet formation and investigated whether or not giant planets could form quickly. They looked at the work of Gerard Kuiper who, in the 1950s, proposed that they could. Alan P Boss of the Carnegie Institute did more extensive work on the subject in the late 1980s. Using computer simulations, he was surprised to find that gravity could cause a proto-planetary disk, after a few orbits of its parent star, to break into clumps as big as average-sized planets. The clumps would continue to pull in gas, ice and dust. This is called the gravitational-instability model of planet formation.</p>
+<p><b class="plab">G</b> Recent calculations have suggested that many of the solid bodies that might be the rocky core for Jupiter-size planets in the traditional theory would spin into the parent star before the massive planet could form. Moreover, further analysis has shown that other effects could also cause a proto-planetary disk to become unstable and split into large fragments. For instance, within the disk, electrically charged material might accumulate, leading to fragmentation of the disk. Or a powerful gravitational disturbance, such as the pull of a star passing nearby, could produce instability in the proto-planetary disk.</p>
+<p><b class="plab">H</b> Nevertheless, the gravitational-instability model has problems of its own, as it is mathematically complicated and requires sophisticated computer use. Therefore, no one has studied the simulations long enough to establish conclusively that the model allows for the formation of massive planets.</p>
+<p><b class="plab">I</b> In response, Mayer says that he and his team have described the results of an extensive simulation based on the gravitational-instability model. They spent two years refining calculations to track what would happen to a proto-planetary disk over one thousand years, which is more than any other simulation had done. In addition, over a decade previously Mayer and his team had made simulations of the formation and evolution of galaxies. In doing so with hundreds of processors, this knowledge assisted them in investigating their gravitational-instability theory.</p></div></div>
+<div class="divider" title="Kéo để đổi độ rộng"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg></div>
+<div class="pane right"><div class="qs"><h3>Questions 27-32</h3>
+<p>Reading Passage 3 has nine paragraphs, <b>A-I</b>.</p>
+<p>Which paragraph contains the following information?</p>
+<p>Write the correct letter, <b>A-I</b>, in boxes <b>27-32</b> on your answer sheet.</p>
+<table class="mx"><thead><tr><th class="mqh">Question</th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th><th>H</th><th>I</th></tr></thead><tbody><tr class="q" id="q27" data-q="27"><td class="mq hl-zone"><b>27</b> the significance of recent discoveries of a large number of massive planets <span class="mk" data-q="27"></span><button class="loc" data-q="27" title="Xem thông tin trong bài đọc" aria-label="Locate 27"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></td><td><label class="mc"><input type="radio" name="q27" value="A"><span></span></label></td><td><label class="mc"><input type="radio" name="q27" value="B"><span></span></label></td><td><label class="mc"><input type="radio" name="q27" value="C"><span></span></label></td><td><label class="mc"><input type="radio" name="q27" value="D"><span></span></label></td><td><label class="mc"><input type="radio" name="q27" value="E"><span></span></label></td><td><label class="mc"><input type="radio" name="q27" value="F"><span></span></label></td><td><label class="mc"><input type="radio" name="q27" value="G"><span></span></label></td><td><label class="mc"><input type="radio" name="q27" value="H"><span></span></label></td><td><label class="mc"><input type="radio" name="q27" value="I"><span></span></label></td></tr><tr class="q" id="q28" data-q="28"><td class="mq hl-zone"><b>28</b> an explanation of the difference between the theories of planet creation <span class="mk" data-q="28"></span><button class="loc" data-q="28" title="Xem thông tin trong bài đọc" aria-label="Locate 28"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></td><td><label class="mc"><input type="radio" name="q28" value="A"><span></span></label></td><td><label class="mc"><input type="radio" name="q28" value="B"><span></span></label></td><td><label class="mc"><input type="radio" name="q28" value="C"><span></span></label></td><td><label class="mc"><input type="radio" name="q28" value="D"><span></span></label></td><td><label class="mc"><input type="radio" name="q28" value="E"><span></span></label></td><td><label class="mc"><input type="radio" name="q28" value="F"><span></span></label></td><td><label class="mc"><input type="radio" name="q28" value="G"><span></span></label></td><td><label class="mc"><input type="radio" name="q28" value="H"><span></span></label></td><td><label class="mc"><input type="radio" name="q28" value="I"><span></span></label></td></tr><tr class="q" id="q29" data-q="29"><td class="mq hl-zone"><b>29</b> the difficulties of proving that the more recent theory of planet creation is correct <span class="mk" data-q="29"></span><button class="loc" data-q="29" title="Xem thông tin trong bài đọc" aria-label="Locate 29"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></td><td><label class="mc"><input type="radio" name="q29" value="A"><span></span></label></td><td><label class="mc"><input type="radio" name="q29" value="B"><span></span></label></td><td><label class="mc"><input type="radio" name="q29" value="C"><span></span></label></td><td><label class="mc"><input type="radio" name="q29" value="D"><span></span></label></td><td><label class="mc"><input type="radio" name="q29" value="E"><span></span></label></td><td><label class="mc"><input type="radio" name="q29" value="F"><span></span></label></td><td><label class="mc"><input type="radio" name="q29" value="G"><span></span></label></td><td><label class="mc"><input type="radio" name="q29" value="H"><span></span></label></td><td><label class="mc"><input type="radio" name="q29" value="I"><span></span></label></td></tr><tr class="q" id="q30" data-q="30"><td class="mq hl-zone"><b>30</b> reasons why Mayer claims he was able to develop his theory <span class="mk" data-q="30"></span><button class="loc" data-q="30" title="Xem thông tin trong bài đọc" aria-label="Locate 30"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></td><td><label class="mc"><input type="radio" name="q30" value="A"><span></span></label></td><td><label class="mc"><input type="radio" name="q30" value="B"><span></span></label></td><td><label class="mc"><input type="radio" name="q30" value="C"><span></span></label></td><td><label class="mc"><input type="radio" name="q30" value="D"><span></span></label></td><td><label class="mc"><input type="radio" name="q30" value="E"><span></span></label></td><td><label class="mc"><input type="radio" name="q30" value="F"><span></span></label></td><td><label class="mc"><input type="radio" name="q30" value="G"><span></span></label></td><td><label class="mc"><input type="radio" name="q30" value="H"><span></span></label></td><td><label class="mc"><input type="radio" name="q30" value="I"><span></span></label></td></tr><tr class="q" id="q31" data-q="31"><td class="mq hl-zone"><b>31</b> a detailed explanation of the long-held theory of planet creation <span class="mk" data-q="31"></span><button class="loc" data-q="31" title="Xem thông tin trong bài đọc" aria-label="Locate 31"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></td><td><label class="mc"><input type="radio" name="q31" value="A"><span></span></label></td><td><label class="mc"><input type="radio" name="q31" value="B"><span></span></label></td><td><label class="mc"><input type="radio" name="q31" value="C"><span></span></label></td><td><label class="mc"><input type="radio" name="q31" value="D"><span></span></label></td><td><label class="mc"><input type="radio" name="q31" value="E"><span></span></label></td><td><label class="mc"><input type="radio" name="q31" value="F"><span></span></label></td><td><label class="mc"><input type="radio" name="q31" value="G"><span></span></label></td><td><label class="mc"><input type="radio" name="q31" value="H"><span></span></label></td><td><label class="mc"><input type="radio" name="q31" value="I"><span></span></label></td></tr><tr class="q" id="q32" data-q="32"><td class="mq hl-zone"><b>32</b> description of the destructive effect of heat in space <span class="mk" data-q="32"></span><button class="loc" data-q="32" title="Xem thông tin trong bài đọc" aria-label="Locate 32"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></td><td><label class="mc"><input type="radio" name="q32" value="A"><span></span></label></td><td><label class="mc"><input type="radio" name="q32" value="B"><span></span></label></td><td><label class="mc"><input type="radio" name="q32" value="C"><span></span></label></td><td><label class="mc"><input type="radio" name="q32" value="D"><span></span></label></td><td><label class="mc"><input type="radio" name="q32" value="E"><span></span></label></td><td><label class="mc"><input type="radio" name="q32" value="F"><span></span></label></td><td><label class="mc"><input type="radio" name="q32" value="G"><span></span></label></td><td><label class="mc"><input type="radio" name="q32" value="H"><span></span></label></td><td><label class="mc"><input type="radio" name="q32" value="I"><span></span></label></td></tr></tbody></table>
+<h3>Questions 33-37</h3>
+<p>Complete each sentence with the correct ending, <b>A-G</b>, below.</p>
+<p>Write the correct letter, <b>A-G</b>, in boxes <b>33-37</b> on your answer sheet.</p>
+<div class="list hl-zone"><p><b>A</b> gaseous planets form before smaller rocky planets.</p><p><b>B</b> large planets take millions of years to form.</p><p><b>C</b> large planets must form fast or not at all.</p><p><b>D</b> large planets had the potential to develop relatively fast.</p><p><b>E</b> gravity could cause planet-sized pieces to break off quickly.</p><p><b>F</b> hot clumps of gas, dust and ice were destroyed relatively quickly.</p><p><b>G</b> computer studies of planets are too mathematically complex.</p></div>
+<table class="mx"><thead><tr><th class="mqh">Question</th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th></tr></thead><tbody><tr class="q" id="q33" data-q="33"><td class="mq hl-zone"><b>33</b> Traditionally astronomers have believed that <span class="mk" data-q="33"></span><button class="loc" data-q="33" title="Xem thông tin trong bài đọc" aria-label="Locate 33"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></td><td><label class="mc"><input type="radio" name="q33" value="A"><span></span></label></td><td><label class="mc"><input type="radio" name="q33" value="B"><span></span></label></td><td><label class="mc"><input type="radio" name="q33" value="C"><span></span></label></td><td><label class="mc"><input type="radio" name="q33" value="D"><span></span></label></td><td><label class="mc"><input type="radio" name="q33" value="E"><span></span></label></td><td><label class="mc"><input type="radio" name="q33" value="F"><span></span></label></td><td><label class="mc"><input type="radio" name="q33" value="G"><span></span></label></td></tr><tr class="q" id="q34" data-q="34"><td class="mq hl-zone"><b>34</b> Lucio Mayer physically observed that <span class="mk" data-q="34"></span><button class="loc" data-q="34" title="Xem thông tin trong bài đọc" aria-label="Locate 34"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></td><td><label class="mc"><input type="radio" name="q34" value="A"><span></span></label></td><td><label class="mc"><input type="radio" name="q34" value="B"><span></span></label></td><td><label class="mc"><input type="radio" name="q34" value="C"><span></span></label></td><td><label class="mc"><input type="radio" name="q34" value="D"><span></span></label></td><td><label class="mc"><input type="radio" name="q34" value="E"><span></span></label></td><td><label class="mc"><input type="radio" name="q34" value="F"><span></span></label></td><td><label class="mc"><input type="radio" name="q34" value="G"><span></span></label></td></tr><tr class="q" id="q35" data-q="35"><td class="mq hl-zone"><b>35</b> Thomas Quinn believes that <span class="mk" data-q="35"></span><button class="loc" data-q="35" title="Xem thông tin trong bài đọc" aria-label="Locate 35"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></td><td><label class="mc"><input type="radio" name="q35" value="A"><span></span></label></td><td><label class="mc"><input type="radio" name="q35" value="B"><span></span></label></td><td><label class="mc"><input type="radio" name="q35" value="C"><span></span></label></td><td><label class="mc"><input type="radio" name="q35" value="D"><span></span></label></td><td><label class="mc"><input type="radio" name="q35" value="E"><span></span></label></td><td><label class="mc"><input type="radio" name="q35" value="F"><span></span></label></td><td><label class="mc"><input type="radio" name="q35" value="G"><span></span></label></td></tr><tr class="q" id="q36" data-q="36"><td class="mq hl-zone"><b>36</b> Gerard Kuiper was the first to suggest that <span class="mk" data-q="36"></span><button class="loc" data-q="36" title="Xem thông tin trong bài đọc" aria-label="Locate 36"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></td><td><label class="mc"><input type="radio" name="q36" value="A"><span></span></label></td><td><label class="mc"><input type="radio" name="q36" value="B"><span></span></label></td><td><label class="mc"><input type="radio" name="q36" value="C"><span></span></label></td><td><label class="mc"><input type="radio" name="q36" value="D"><span></span></label></td><td><label class="mc"><input type="radio" name="q36" value="E"><span></span></label></td><td><label class="mc"><input type="radio" name="q36" value="F"><span></span></label></td><td><label class="mc"><input type="radio" name="q36" value="G"><span></span></label></td></tr><tr class="q" id="q37" data-q="37"><td class="mq hl-zone"><b>37</b> Alan P Boss discovered that <span class="mk" data-q="37"></span><button class="loc" data-q="37" title="Xem thông tin trong bài đọc" aria-label="Locate 37"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></td><td><label class="mc"><input type="radio" name="q37" value="A"><span></span></label></td><td><label class="mc"><input type="radio" name="q37" value="B"><span></span></label></td><td><label class="mc"><input type="radio" name="q37" value="C"><span></span></label></td><td><label class="mc"><input type="radio" name="q37" value="D"><span></span></label></td><td><label class="mc"><input type="radio" name="q37" value="E"><span></span></label></td><td><label class="mc"><input type="radio" name="q37" value="F"><span></span></label></td><td><label class="mc"><input type="radio" name="q37" value="G"><span></span></label></td></tr></tbody></table>
+<h3>Questions 38-40</h3>
+<p>Complete the summary using the list of words, <b>A-F</b>, below.</p>
+<p>Write the correct letter, <b>A-F</b>, in boxes <b>38-40</b> on your answer sheet.</p>
+<div class="summary sbox hl-zone">
+<h4>The core-accretion model</h4>
+<p>A hard centre becomes larger and this produces enough gravity to draw gas from the <span class="gap" id="q38" data-q="38"><span class="dz" data-q="38"><b>38</b><span class="dzv"></span></span><span class="mk" data-q="38"></span><button class="loc" data-q="38" title="Xem thông tin trong bài đọc" aria-label="Locate 38"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></span> around it.</p>
+<h4>The gravitational-instability model</h4>
+<p>Stars can break up the outer gaseous parts which surround objects in the sky because the attraction of the <span class="gap" id="q39" data-q="39"><span class="dz" data-q="39"><b>39</b><span class="dzv"></span></span><span class="mk" data-q="39"></span><button class="loc" data-q="39" title="Xem thông tin trong bài đọc" aria-label="Locate 39"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></span> from stars is very powerful.</p>
+<p>Heat caused by <span class="gap" id="q40" data-q="40"><span class="dz" data-q="40"><b>40</b><span class="dzv"></span></span><span class="mk" data-q="40"></span><button class="loc" data-q="40" title="Xem thông tin trong bài đọc" aria-label="Locate 40"><svg viewBox="0 0 24 24" width="16" height="16"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button></span> can also destroy the material surrounding the object in a relatively short time. Planet-sized segments may split away from the main body following several orbits of the parent star.</p>
+<div class="bank"><span class="chip" draggable="true" data-v="A"><b>A</b> gravitational pull</span><span class="chip" draggable="true" data-v="B"><b>B</b> ice</span><span class="chip" draggable="true" data-v="C"><b>C</b> solid core</span><span class="chip" draggable="true" data-v="D"><b>D</b> ultraviolet light</span><span class="chip" draggable="true" data-v="E"><b>E</b> Milky Way</span><span class="chip" draggable="true" data-v="F"><b>F</b> disk</span></div>
+</div></div></div></div></section>
+</main>
+<footer>
+  <div class="navparts" id="nav"></div>
+  <div class="arrows">
+    <button class="ib" id="prev" aria-label="Previous"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4"/></svg></button>
+    <button class="ib" id="next" aria-label="Next"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4"/></svg></button>
+  </div>
+  <button class="subbtn" id="subBtn"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6"/></svg>Nộp bài</button>
+</footer>
+
+<div id="hlmenu"><button id="hlDo"><span class="sw"></span>Highlight</button><button id="hlClr">Clear</button></div>
+<div id="toast"></div>
+
+<!-- start -->
+<div class="ov" id="start"><div class="card">
+  <h1>Week 16 · Reading Full Test (2)</h1>
+  <p class="sub">IELTS Academic Reading · 3 passages · 40 questions · 60 minutes</p>
+  <div class="fld"><label for="inName">Họ và tên</label><input id="inName" autocomplete="off"></div>
+  <div class="fld"><label for="inCls">Lớp</label><input id="inCls" autocomplete="off"></div>
+  <ul class="rules">
+    <li>Con có <b>60 phút</b>. Hết giờ, bài sẽ tự động nộp cho Thầy Độ.</li>
+    <li>Bài làm ở chế độ <b>toàn màn hình</b>. Mỗi lần thoát toàn màn hình đều được ghi lại.</li>
+    <li><b>Tô từ khoá:</b> bôi đen chữ trong bài đọc hoặc câu hỏi rồi bấm <b>Highlight</b>. Bấm vào chỗ đã tô để xoá.</li>
+    <li>Câu 38-40: kéo thả từ vào ô trống, hoặc bấm chọn từ rồi bấm vào ô.</li>
+    <li>Sau khi nộp, con chỉ xem được câu nào <b>đúng / sai</b>, không xem đáp án. Bấm kính lúp cạnh câu hỏi để xem thông tin nằm ở đâu trong bài đọc.</li>
+  </ul>
+  <div class="err" id="startErr"></div>
+  <button class="big" id="startBtn">Bắt đầu làm bài</button>
+</div></div>
+
+<!-- fullscreen warning -->
+<div class="ov" id="fsWarn"><div class="card warnbox">
+  <svg class="wi" viewBox="0 0 24 24"><path d="M12 3L2 21h20L12 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="18" r="1.3" fill="currentColor"/></svg>
+  <p>Thầy Độ đề nghị không thoát màn hình và tiếp tục làm bài.</p>
+  <button class="big" id="fsBack">Quay lại làm bài</button>
+</div></div>
+
+<!-- confirm -->
+<div class="ov" id="confirm"><div class="card" style="max-width:460px">
+  <h1 style="font-size:21px">Nộp bài?</h1>
+  <p id="cfMsg" class="sub"></p>
+  <div class="row2"><button class="big gray" id="cfNo">Làm tiếp</button><button class="big" id="cfYes">Nộp bài</button></div>
+</div></div>
+
+<!-- result -->
+<div class="ov" id="result"><div class="card res" style="max-width:520px">
+  <h1 style="text-align:center;font-size:20px">Kết quả bài làm</h1>
+  <div class="score" id="rScore"></div>
+  <div class="band" id="rBand"></div>
+  <div class="pp"><div>Part 1<b id="rp1"></b></div><div>Part 2<b id="rp2"></b></div><div>Part 3<b id="rp3"></b></div></div>
+  <div class="note">Thầy Độ không công bố đáp án. Khi xem lại, câu đúng có dấu <b style="color:#1e8e3e">✓</b>, câu sai có dấu <b style="color:#d93025">✗</b>. Con bấm <b>kính lúp</b> cạnh mỗi câu để xem thông tin trả lời nằm ở đâu trong bài đọc, rồi tự tìm lại đáp án đúng nhé.</div>
+  <p class="sendst" id="sendSt"></p>
+  <button class="big" id="rClose">Xem lại bài</button>
+</div></div>
+
+<script>
+const CFG = {
+  WEB_APP_URL: "https://script.google.com/macros/s/AKfycbyK253joatdNwOCjlen-ywYDkFi6Cz8JDmpRI3x9Wd4dOMcINxo5ApwrMavtAsCoO9Z5g/exec",   // URL Web App của Apps Script (kết thúc bằng /exec)
+  TEST_ID: "W16-READING-2",
+  TEST_NAME: "W16 Reading Test 2",
+  DURATION_MIN: 60,
+  SALT: "W16R2|"
+};
+const HASH = {"1":["df27955e"],"2":["70e95184"],"3":["9fd41010"],"4":["f9e98b4d"],"5":["440cc30a"],"6":["64029235"],"7":["965c8a22"],"8":["2af09ebd"],"9":["89d0981e"],"10":["27e253a1"],"11":["1774ffc1"],"12":["ebaa3a6b"],"13":["4a10872f"],"14":["ff84ebcc"],"15":["8b08deb6"],"16":["3269f2be"],"17":["b3015c0f"],"18":["f92a1d57"],"19":["87ae14fa"],"20":["41bb663d"],"21":["ee37cb7b"],"22":["64b3dbb7"],"23":["e31c70d3"],"24":["ade09545"],"25":["d01df517"],"26":["ba3121af"],"27":["327f7df3"],"28":["927939f3"],"29":["4df5b6ce"],"30":["c033997b"],"31":["34caefe8"],"32":["884e8aaa"],"33":["134b4edb"],"34":["0b110496"],"35":["8ca86f7a"],"36":["d62bfa7e"],"37":["63aff08e"],"38":["13f171ea"],"39":["8b88cd10"],"40":["9018c46b"]};
+const EV = {"1":"==gLz52bpRXd0lGdz5WagU2clhGdgY2bgUWbvNHI5JGIkVGdpJWao9mcwBydv5GIzlGIzRmchNGIoNWdzBiZvBSZzVHIlhGdgQXYoRHIsUGbw1WY4VGIy9mZgwyay9WWgcXZOBiZvByc0JXYwBibpBibv1WbvNGIvNHIl12bjVmYgMXYoBSZjlGdjFmcwBycphGV","2":"==gLkJXYjByczVmbpNXdiBSZoRHIm9GI05WZ2RWYgUGa0ByZulGbsFmbnl2cgwyc05WZtV2cpRnclZHZhBSZyVHdhlmbp1GIzFGI0NWYg8GdgQmchNGIm9GIlBXe0Bydl5GIhBCZlRnblZnbpBSZsB3blB3czVmbpNXdiBibhVGcvJXdFBCL5JXd05WZjBCa0dTMgUGa0BibpBCLuVGaUBiL5xmbvByclN3bwJXdwBCbhl2YvNHIy9mZgUmcldHIlNXZoRHI0VnYgwCdpNXa2BSYg0WZoRHI5FGcg8GdgQWZk5WZ05WagkXZoRHI0FGa0BSZjlGdv5GIlxGcvVGcgUmdpdGIvRHI5JXd05WZjBCa0VTMgUGa0BibpByckJXYjByZulGbsF2YgQWZ05WZ25WagU2cl5WaoNEIlhGV","3":"uMHZyF2YgM3cl5WazVnYgM3J55WYw12bjBSZoRHIm9GIu9Wa0l2cvBXbvNGIlhGdg4WYoRHIn5Wa0VWZtBCZyF2biBSYgQXYg42bpN3c1N2cpRGIkVGdhVGagUmcv1GIlt2b29mcwBibhNGIzdmbphGdgcXZmBSeyVmd","4":"u0WZoRHIu9GIkVGctFGdzBycslWY0VGZgQ3YhRnbvNGIylWZoRHIoRXa3ByclJXdnlmZgMWa0NXYsBHIlxGd0lGbgQXdvBSZ2l2ZgknbhBXbvNGI59GdgMXdv1WYmBSZu9GI0FGIzVWZ59Gbw1WR","5":"=4CZuVGIuFGI0FGI5xmchVmbgMXagQmchNGIzNXZul2c1JGIsF2YpNXeoBHIhBiZvBSZzVHIlhGdgQXYoRHIlZ3byBHIzRmchNGIzNXZul2c1JGI5t2Yp1WbpdGIoNWdzBCLzJ3b0FGduVWbt92YgM3cl5WazVnYgknbh1GIy9mR","6":"=4yczVmbpNXdiBCb1Z2czV2YjV3cgEGIn5Wau5WdyBicvZGI05WZtVGblBSeltGIlhGdgMXY3BCdzVnc0BCdhhGdgQmb19mZgE2YpJXZtFEIoRncv5EIulGIzVmdpRXdjVGelByczVmbpNXdiBCMwIDIuFGa0BSZy9WbgY2bgkHZ1R3cgYDMwIDIyVGS","7":"=4Cbh52bpR3btVGIlhGdg42bgMXdj9mZg8GdgUmdhhGI0FGa0Bycn5WalJGIuFWb1hGIsxWa0NHIzlGI0lGIsM3azFGdgUmdpRXYyR3cp5WatRWYggGdpdHIsFWZkBibhNGIzJXZ0VHct92YgUGbph2d","8":"=U2ZhV3ZuFGbg42bt12bjBSYgQ3buBycpBSZyVGa0Biblh2dgkHbsFWajVGczVGIsMHdyFGcyVGduV3bjBCbh52bpRXYuJXZ05WaggGdpdHIn5WasFWZkBiblh2dg4WagQncvZmZlBSZy9WbgQXdwByb0BSZ2FGagMncldWYuFWT","9":"=4CblZXYyRHIsFmbvlGdh5mclRnbpBibvBycrVWZ3Bic19mZgknclZXZgY2bgQXdvBSZlJHa0BCZuVGczBSesVmbpRXdvJHI39mbgMnbvlGdhNXauF2Zy9GIsFmYvx2ZgY2bgMXZ2lGd1NWZ4VGImVWaoNGI0FGa0BCZld3boNHI5VmdyV3cgsUVgQnblNWZyBSQ","10":"u8GZgIXZ2VmbgQGb192dgMHdzlGbgMWau9mc0NWZsVGItJ3bmlmb1BCanV3byhGdgcmbpt2bvxGI5xGctl2cgQXYoRHIzlXY3BibpBSey9Wbl1GIyV3b5BSZj5WYo5WZg4WYjByckJXYjBCduVmclZmZpRGIm9GIzVGbpBHIodWdvJHa0ByZul2av9GT","11":"uMnbvlGdhJ3bwJ3bjBCbh52bpRXYulGdsVXbg4WagQXZl1GI19WegQ3YhRnbvNGI5JXZ2VGIm9GIzVHdhR3cgQ3YhhXZgUGa0ByZulmbp1mclRXZkBibpBCbhlGduV2czVGIlJXYgMHZyF2Y","12":"u9Wa0F2cyVmdu92YgEGIn5Wa0FWa0lmbpBiZvBSehdHIlZXa0NWZmZWZg4WYgUmYg4WYjByckJXYjByczVmbpNXdiByZul2ZuFGajhXZ","13":"ukXYsBHIvRHIlx2byBSZsJWY1xWY2BSesxWY1FXZg4WYgMXYoBybzxWYg42bpRXakFmc0BCL3VWa2BycnUmc5RnbJNWTgQXZuFmSg4Wa","14":"uQXagY2bgU2c1F2YlJGITCo4gIXZoR3bgg2YhVGIvRHIyV2Yp5GIuVmdlBSZilXYtBykAKOIyVWawBXYoBSZiByb0BSesV2apxGIlJ3J5VGa0BCZuFEIucmbpJ3biByZulGZslWdiBycphGdgQmbpZGIkxWdvdHI5JGIzNXYwBybodHIzJXZrJ3bZBydl5EI3VmR","15":"==gLnMXZjlmZm9GI5h3biBCLr5WYsJGIscWaidCI09mbgwycn5Wa0RXZzBSZ0F2YpJHdulGIulGI0NXZiBibvlGdj5WdmBCLlV3ZyFGI5VGa0BCLlxGcvVGU","16":"==gLncmbppXasFWaj92cnACZuFGIscSesVmdpx2JgU2apxGIzRmcvdHIkVGdzlGbgkXZoRHIk5WYgwCduVWblRXajhXZgY2bgMHblZXZsBCanlGagQWZyV3chVWbgUGbw9WZwBykAKOInM3dvRmbpdHIk5WYgMncv9GZg4WZw9GIm9GIzR3bsBCa0l2dgMHduFmc1FGdzVmcgY2bgEWZzBSesVmdpx2JgEGITCo4gUGdpNHI0NXZ0BiclhGdvBSZoRHI0FGI0NXYlByaj9GbiBSZu9GIsQ3chJHdu92Yg4WSg4yJzNXZs52bpN3chB3JgQmbhByJk5WYsJ2JgU2apxGIzRmcvdHIkV2c1BSelhGdgwSZjFGbwBycphGdgUmYpJ3YzVGZg8GVg4CZlJ3biBSZyV2dgkXZoRHIsQWZulWYsBHelBCZyFGbsVEIskHbsF2Ypd2bs9WazlHaQBiLkVGdl1Wb1xGcgwWYzV3byFGIm9GIlRXY0NHIzdSZsB3blBHIsQXZrJXYNByck92bGBSZs9GaXByYphGdpx2bu9WbgUGa0ByZul2czFGU","17":"=4SZtlGdgI3bmBCZlN3clJHcgM3clxGI0xWZmBybzxWYgQWZ3FGIlJXZ3BSelhGdgQWahNHIvh2dgU2cvhGdgwycldWYtlGIsFWd0JXa2BiZvBSZ0Vnbp1GIhBSes52bgIXZ0ZWQ","18":"=ciLlJXd0NWZ0lGajJXYgI3bgsmchBHI05WZtV2c11WYg4WYg4WagIXZoRXZodHIn5WasxWayhGdgMXagkHdphXZsBXbvN0J","19":"=MHZu92YlNHI3VmZgknclZXZgU2ZuFGajBicvBSe0xWZ29mbgY2bgQmbptGIl12bzBSZjVHZvJHcg8GdgUmYgQGb19GazBibnl2clRGIuFmYyVHIm9GIlZXa0NWZqJ2bg4Wah1GIlhGdgQXYoRHIz5WahxGc4VGIkJXYsxWR","20":"uMXZu9GIlZXa0NWYulGI0FGIuFGa0BSZj5WY0NXazNXYgIXZmZ2bg8GdgkHbltWasBSZy9WbgMXZtlGdgUmdpZGI5xmchVmbgUmcldHIzVGdpNHIlZXa0NWYgQXYgMnbhlmc0NXZkVGU","21":"==gbvl2czV2cz9GcgEGIyVmdvBSZj5WZpJXZwhXZg4WYgU2cv9GajByb0BSesV2apxGIlJ3btBSZyV2dgcSZ3FGI0xWZmdCI0NXdqBCZhhGIvh2dgU2cvhGV","22":"=4yJ5N3cl1GIk5WYgkHbnVHIm9GIk5WardCIlJXYgwyclV3ZyFGIlhGIskHdpNEIrJ3bZBydl5EIulGIzt2YvxmYgQ3cllGcwFGagUGa0BiZvBSZt92U","23":"=4CZlJ3biBSZyV2dgkXZoRHIsQWZulWYsBHelBCZyFGbsVEIskHbsF2Ypd2bs9WazlHaQBiLkVGdl1Wb1xGcgwWYzV3byFGIm9GIlRXY0NHIzdSZsB3blBHIsQXZrJXYNByck92bGBSZs9GaXByYphGdpx2bu9WbgUGa0ByZul2czFGU","24":"ucmbp5mcv1GIoNWYlBCdpBiclRnblBybodHIzVWZ59Gbw1WZgcmbppXanJXZuVGIlxWaodHIsMXZ0VXbt92YgkHbpFGZgIXalhGdg02byZGIzJXZsxWZ3RGI5RXajByc0x2bqBSZkF2YhZGIlhGdgwSZkl2c0V3bgUGa0BSbvJnR","25":"lJXd0BHb1N2cgIXZ0F2dgkncvR3ctUWZyhGdgEGIwVHIsMncvRXYsF2YzVGIsFmbvdWYpRGIu9Gc1BCblZXYyRHIzJXZrJ3b3BCLlRWaz5WS","26":"=4CdodWasBCa0l2dgQWZk92bsZGIs0WdpJHdhByYpJ3b0NXaoBycnIXZ39GdgUGa0BCanV3byhGd","27":"==gLtVGdzl3cgIXYs92cgIXdvBSZkl2c0V3bgIXZ0lGc1pEIzFGIldmchxGIzFGIzRXZuFGbwBCZlJHZuVHagUmbvBibhhGdgUmcv1GIk5WdvZGIlZXYoBycyVWbv52byR3chBCL1kTOxASZj5WazBCLyVmdld3bIBiLlJXYyBSZiBCZsV3boNHIyVGdpBXdKBSZrlGbgMHdl5WYsBHInQnbhl2ZgMXYndCIsQ3YlJncvNGIzlGIsVGZv1GIu9Wa0VmcjNWYtUmcvNGIlhGdgYWagQXYoRHIzRnclN3chBybzxWYgUGS","28":"=4ibvlGdh1mcvZGI0VmbhxGcgI3bmBycsVGZv1GIvdHdgUGa0BibpBSe0lmchB3cpRGIlhGdgUGZpZ3byBHI0FGa0BCLzBXb1x2YgwWYpRXaulGIlhGdgY2bgUmepNHIlhGdgQmbhBCLn5WayVGdzVHbjBSZoRHIm9GIkVWZwNHIlhGdgMXagQXagwiclZXZ39GS","29":"==gLzRXZuFGbwBSZ2l2czFWbgY2bg42bpRXYtJ3bmBSZoRHIy9mZgM3dvxGbhBCblR2btBSZoRHI0FGa0BSesVmdpNXdsNmbvNGIoNXasJWY0NXZg8Gdgg2Z19mblByZu9GbgMnbvlGdhxWdtl2cgUGa0BCZllGZ1R3cgMXYoBSZu9GIv5GIsUmcvZWZyVGaUBiLlNXdgIXZ0VHct92YgQWZ0F2YpR3cphGcvNHIzVmcpVXclJHIk5WYgQWZ0F2YpxGct92YgkHbsF2YpRXYtVGa0FWbgMXagQXagMXYgwib39GIzRXagY2bgMXblxmYvJHcgMXYoBCblR2btBSe0lGbpJWY0Nnbp1Cbh52bpRXY0lmdhJ3ZgUGa0BCLzNXZsVGa0JXZ2VmT","30":"=4Sey9WZoRHI5RXaslmYhR3culWLsFmbvlGdhRXa2FmcnBicpVGa0ByZulGdhdWa0NXZ25Wag4Wag0WZoRHIkVGdzl2czFGIldGZlx2dv52agMXaoRHIsMncvN3clN2byBHIm9GIzRWZyRmb1hGIoRXa3BybzByZul2bkBibJBiLzVWa4FGbhdGIm9GIu9Wa0VHbvZXZgQmbhBibvlGdh1mcvZGIlhGdgY2bgMnbvlGdhxWdtl2cgUGZh1GIkFGag0WYlRHIzlGagQmbhBicllXYNBSesNXdvlmdlJHcgUGZhNWZkBSYgIXZ29GIs42bpRXakRWYg4WS","31":"=4iclRXawVnSgQmbhBibyVHdhNFIzV3blNXYnBSZrlGbgMHduFWanByZulWbvNWZiBCLyV2ZyFGbgIXYmBydvJ3ZgkXZoRHIk5WYgMXZpR2biBCZpx2bzBSZzVGa0BiZvBSZt92cgQmb19mchByclxGd0V2cgs2cpRGIlhGdg02byZGIzF2ZgwycyFWZ5BibvlGbslWbgcXZmBCd4VmbgUGa0BiclZ3Tg4ycyFWTgQmbhBCa0JXYFBSZrlGbgMHdl5WYsBHI5t2YvJHItJ3bmBSZzVGa0BCLzJXYllHIu9WasxWatBSYgQXdvJWYg4WSg4yc0NWZqJ2bgIXZndWaiBCZuFGIyV2ZnlmYg8GdulGIlN2clxWYvNGIzVmdsV2ctVGa0BCajlGa3BCLzVWak9mYgQWZ6l2ctIXZkxWdvJGItJ3bmByb0BSZnJXZtBCdhhGdgQ3c1RGIm9GIzRXaiBiclhGdld2b0BycyVGa0F2ZgkHdpZXYydGIsQ3cylmR","32":"uMnchVWegADMwwCMwEDIuFGa0ByczVGbg4Wags2cpRGI5JXY0VmbhxGct8GdvJHcgEGIlRXYy9GchZXZg4WYjBSZjFGczByb05WagQmblNHI5VGa0BCdodWasBCdlx2bpZXYyRHb1BSZoRHIk5WYgU2cuVGdulGI5JXZ2BSZyFGIzVmc1RXYyVGctVGdgIXalhGV","33":"=4CZlZXZpxWZiBSesNXdvlmdlJHcgMXYgMnchVWegY2bgMnbvlGbslWbg4WYoRHIyVGa0Fmc","34":"=MnchVWeg42bpxGbp1GIuVmdlNHI0V3biFGIuFGa0BSZy9WbgQ3chxGI09mbg8GZgM3azlGZgknchRXZuFGbw1yb09mcwBSZoRHI0FGa0BCdzV2ZnV3cgM3ZulGdodWazBSZw92YzVGblRHI0NWZylGR","35":"==gLtJ3bmBiclZXZuBSesJWYi9mcwBCbsl2dgQXagwSest2YpVXcg0mcvZGI09mbuF2YgQXZuFGbwByJ05WYpdGIzF2ZnASYgYWagQXYoRHIzVGZ1x2Yu92Yg42b0dmbph2chdFIm9GI5RXazJXZ2lmbVBSZoRHIm9GIu5Wa1FFIzFWbvhGV","36":"==gLkxWdvNGI5VGa0BCdhhGdgQWZz9GcvJHcgwycwUTOxASZoRHIulGIs8Ga3BiclBXa1tEIkJXYyV2RgY2bgsmcvdHIlhGdgQXYgQWZr92bsBSelhGV","37":"==gLzRXZuFGbwBCZlpXaz1SZnFmclZXYgMXYgcWaiBychBycw1WdsNGIvRnbpByahVmciByb0BCLyFGdzBCduVmchBHIzRXagY2bgMHdpJmcvBydlZGIhBiclRnZhBCLrNXakBSeyFGdl5WYsBXLvR3byBHIhBSZzVXYjBCZsV3bjBSe0lmdhJ3ZgQXYoRHIk5WamByb0BCZlNXayBnc1NHIzF2dgUGa","38":"==wazlGZgknchRXZuFGbw1yb09mcwBSZoRHIt9mcmBychdGIm9GI05Wdv1WYgU2Z1hGIhBCdjFmc0RXYg8GdgkHdpZXYydGIodWdv5WZgQWYoBiblhGdgUmcvNGIldmchxGIlhGdgQXYoRHIlZXZpxWZiBycyVWbv52byR3chBCdz9WT","39":"uM3clxGIy9GIzJXYllHIwADMsADMxAibpBCZll3byR3clRGIn5WalJGIzt2cpRGI5JXY0VmbhxGct8GdvJHcgUGa0BiZvByc0JXYwByc19WZzF2ZgIXZ0V3bgUGa0BibpBCdsV3clJHIuF2Yg0WZoRHIuVWZ3RXZiBCbsVHcgwWYu9Wa0FGdpZXYydGIlhGd","40":"=4ycyFWZ5BCMwADLwATMg4WYoRHIzNXZsBibpByazlGZgknchRXZuFGbw1yb09mcwBSYgUGdhJ3bwFmdlBibhNGIlNWYwNHIvRnbpBCZuV2cgkXZoRHI0h2ZpxGI0VGbvlmdhJHdsVHIlhGd"};
+const BANK = {"A": "A gravitational pull", "B": "B ice", "C": "C solid core", "D": "D ultraviolet light", "E": "E Milky Way", "F": "F disk"};
+const PARTS = [[1,13],[14,26],[27,40]];
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const partOf = q => q <= 13 ? 1 : (q <= 26 ? 2 : 3);
+
+/* ---------- SCORM (1.2 + 2004) ---------- */
+const SC = {api:null, v:null,
+  find(w){let n=0;while(w&&n<12){if(w.API_1484_11)return[w.API_1484_11,'2004'];if(w.API)return[w.API,'12'];if(w.parent===w)break;w=w.parent;n++}return null},
+  init(){try{let r=this.find(window)||(window.opener&&this.find(window.opener));if(!r)return;[this.api,this.v]=r;
+    this.v==='2004'?this.api.Initialize(''):this.api.LMSInitialize('');}catch(e){this.api=null}},
+  k(n){const m={name:['cmi.core.student_name','cmi.learner_name'],id:['cmi.core.student_id','cmi.learner_id'],
+    sus:['cmi.suspend_data','cmi.suspend_data'],exit:['cmi.core.exit','cmi.exit']};return m[n][this.v==='2004'?1:0]},
+  get(n){if(!this.api)return'';try{return String((this.v==='2004'?this.api.GetValue(this.k(n)):this.api.LMSGetValue(this.k(n)))||'')}catch(e){return''}},
+  set(k,val){if(!this.api)return;try{this.v==='2004'?this.api.SetValue(k,String(val)):this.api.LMSSetValue(k,String(val))}catch(e){}},
+  setN(n,val){this.set(this.k(n),val)},
+  commit(){if(!this.api)return;try{this.v==='2004'?this.api.Commit(''):this.api.LMSCommit('')}catch(e){}},
+  finish(){if(!this.api||this.done)return;this.done=true;try{this.commit();this.v==='2004'?this.api.Terminate(''):this.api.LMSFinish('')}catch(e){}},
+  report(score,max){if(!this.api)return;
+    if(this.v==='2004'){this.set('cmi.score.raw',score);this.set('cmi.score.min',0);this.set('cmi.score.max',max);this.set('cmi.score.scaled',(score/max).toFixed(2));
+      this.set('cmi.completion_status','completed');this.set('cmi.success_status','passed');this.set('cmi.exit','');}
+    else{this.set('cmi.core.score.raw',score);this.set('cmi.core.score.min',0);this.set('cmi.core.score.max',max);this.set('cmi.core.lesson_status','completed');this.set('cmi.core.exit','');}
+    this.commit();}
+};
+SC.init();
+window.addEventListener('beforeunload',()=>{save(true);SC.finish()});
+
+/* ---------- state ---------- */
+const canvasName = (()=>{let n=SC.get('name').trim();if(n.includes(',')){const p=n.split(',');n=(p[1].trim()+' '+p[0].trim()).trim()}return n})();
+const canvasId = SC.get('id');
+const LSKEY = 'w16r2_'+(canvasId||'local');
+let st = null;
+(function load(){
+  let raw = SC.api ? SC.get('sus') : null;
+  if(!raw && !SC.api){try{raw=localStorage.getItem(LSKEY)}catch(e){}}
+  if(!raw && SC.api){ // same Canvas attempt reopened in this browser before any commit
+    try{const l=JSON.parse(localStorage.getItem(LSKEY)||'null');if(l&&l.startedAt&&!l.submitted)raw=JSON.stringify(l)}catch(e){}}
+  try{st=raw?JSON.parse(raw):null}catch(e){st=null}
+  if(!st||st.t!==CFG.TEST_ID) st={t:CFG.TEST_ID,a:{},fs:[],part:1};
+})();
+let lastCommit=0;
+function save(force){
+  const s=JSON.stringify(st);
+  try{localStorage.setItem(LSKEY,s)}catch(e){}
+  if(SC.api){SC.setN('sus',s);if(!st.submitted)SC.setN('exit','suspend');
+    if(force||Date.now()-lastCommit>15000){SC.commit();lastCommit=Date.now()}}
+}
+
+/* ---------- grading (hashed) ---------- */
+function norm(s){return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim().replace(/\s+/g,' ').replace(/^[^a-z0-9]+|[^a-z0-9]+$/g,'')}
+function fnv(s){let h=0x811c9dc5;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,0x01000193)>>>0}return h.toString(16).padStart(8,'0')}
+function correct(q,a){if(!a)return false;return HASH[q].includes(fnv(CFG.SALT+q+'|'+norm(a)))}
+function band(s){const t=[[39,9],[37,8.5],[35,8],[33,7.5],[30,7],[27,6.5],[23,6],[19,5.5],[15,5],[13,4.5],[10,4],[8,3.5],[6,3],[4,2.5],[1,1]];for(const[m,b]of t)if(s>=m)return b;return 0}
+function grade(){const marks={},parts=[0,0,0];let score=0;
+  for(let q=1;q<=40;q++){const ok=correct(q,st.a[q]);marks[q]=ok?1:0;if(ok){score++;parts[partOf(q)-1]++}}
+  return{score,parts,marks,band:band(score)}}
+const dec = s => decodeURIComponent(escape(atob(s.split('').reverse().join(''))));
+
+/* ---------- UI: parts & nav ---------- */
+let curQ=1;
+function showPart(n){st.part=n;$$('.part').forEach(p=>p.classList.toggle('on',+p.dataset.part===n));renderNav()}
+function answered(q){return !!(st.a[q]&&String(st.a[q]).trim())}
+function renderNav(){
+  const nav=$('#nav');nav.innerHTML='';
+  PARTS.forEach(([a,b],i)=>{const n=i+1,d=document.createElement('div');d.className='np'+(st.part===n?' on':'');
+    if(st.part===n){let h=`<span class="lab">Part ${n}</span>`;
+      for(let q=a;q<=b;q++){let c='qb';if(answered(q))c+=' ans';if(q===curQ)c+=' cur';if(st.submitted)c+=st.res.marks[q]?' ok':' no';h+=`<button class="${c}" data-q="${q}">${q}</button>`}
+      d.innerHTML=h;}
+    else{let c=0;for(let q=a;q<=b;q++)if(st.submitted?st.res.marks[q]:answered(q))c++;
+      d.innerHTML=`<span class="lab">Part ${n}</span><span class="cnt">${st.submitted?'đúng '+c+'/'+(b-a+1):c+' of '+(b-a+1)}</span>`;
+      d.onclick=()=>{showPart(n);curQ=a;goQ(a)}}
+    nav.appendChild(d)});
+  $$('#nav .qb').forEach(b=>b.onclick=()=>goQ(+b.dataset.q));
+}
+function goQ(q){q=Math.max(1,Math.min(40,q));curQ=q;if(st.part!==partOf(q))showPart(partOf(q));else renderNav();
+  const el=document.getElementById('q'+q);if(!el)return;el.scrollIntoView({block:'center',behavior:'smooth'});
+  const inp=el.querySelector('.gin');if(inp&&!st.submitted)setTimeout(()=>inp.focus({preventScroll:true}),250)}
+$('#prev').onclick=()=>goQ(curQ-1);$('#next').onclick=()=>goQ(curQ+1);
+
+/* ---------- answers ---------- */
+let saveT;
+function setAns(q,v){st.a[q]=v;curQ=q;clearTimeout(saveT);saveT=setTimeout(()=>save(),400);renderNav()}
+document.addEventListener('click',e=>{if(st.submitted&&e.target.type==='radio')e.preventDefault()},true);
+document.addEventListener('change',e=>{const t=e.target;if(t.type==='radio'&&/^q\d+$/.test(t.name)&&!st.submitted)setAns(+t.name.slice(1),t.value)});
+document.addEventListener('input',e=>{const t=e.target;if(t.classList.contains('gin')&&!st.submitted)setAns(+t.dataset.q,t.value)});
+document.addEventListener('focusin',e=>{const q=e.target.closest&&e.target.closest('[data-q]');if(q&&q.dataset.q){curQ=+q.dataset.q;renderNav()}});
+function restoreInputs(){
+  for(const[q,v]of Object.entries(st.a)){const r=document.querySelector(`input[name="q${q}"][value="${CSS.escape(v)}"]`);if(r)r.checked=true;
+    const g=document.querySelector(`.gin[data-q="${q}"]`);if(g)g.value=v}
+  renderDrops()}
+
+/* drag & drop 38-40 */
+let selChip=null;
+function renderDrops(){const used=new Set();
+  $$('.dz').forEach(z=>{const q=+z.dataset.q,v=st.a[q]||'';z.querySelector('.dzv').textContent=v?BANK[v]:'';z.classList.toggle('filled',!!v);if(v)used.add(v)});
+  $$('.chip').forEach(c=>c.classList.toggle('used',used.has(c.dataset.v)))}
+function place(q,v){if(st.submitted)return;for(const k of[38,39,40])if(st.a[k]===v)delete st.a[k];if(v)st.a[q]=v;else delete st.a[q];setAns(q,st.a[q]||'');if(!st.a[q])delete st.a[q];renderDrops();renderNav()}
+$$('.chip').forEach(c=>{
+  c.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',c.dataset.v);e.dataTransfer.effectAllowed='move'});
+  c.addEventListener('click',()=>{if(st.submitted)return;selChip=selChip===c?null:c;$$('.chip').forEach(x=>x.classList.toggle('sel',x===selChip))})});
+$$('.dz').forEach(z=>{const q=+z.dataset.q;
+  z.addEventListener('dragover',e=>{if(st.submitted)return;e.preventDefault();z.classList.add('over')});
+  z.addEventListener('dragleave',()=>z.classList.remove('over'));
+  z.addEventListener('drop',e=>{e.preventDefault();z.classList.remove('over');const v=e.dataTransfer.getData('text/plain');if(BANK[v])place(q,v)});
+  z.addEventListener('click',()=>{if(st.submitted)return;curQ=q;if(selChip){place(q,selChip.dataset.v);selChip.classList.remove('sel');selChip=null}else if(st.a[q])place(q,'');else renderNav()})});
+
+/* ---------- divider ---------- */
+$$('.divider').forEach(d=>d.addEventListener('pointerdown',e=>{e.preventDefault();const sp=d.parentElement,r=sp.getBoundingClientRect();
+  const mv=ev=>{let p=(ev.clientX-r.left)/r.width*100;p=Math.max(25,Math.min(75,p));document.documentElement.style.setProperty('--lw',p+'%')};
+  const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up)};addEventListener('pointermove',mv);addEventListener('pointerup',up)}));
+
+/* ---------- highlight ---------- */
+const SKIP='input,button,.mk,.loc,.dz,.chip,#hlmenu';
+function textNodesIn(root,filter){const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:n=>(n.parentElement&&!n.parentElement.closest(SKIP)&&(!filter||filter(n)))?1:3});const a=[];let n;while(n=w.nextNode())a.push(n);return a}
+function wrapSeg(segs,cls){const out=[];for(const{node,s,e}of segs){if(s>=e)continue;let n=node;if(e<n.length)n.splitText(e);if(s>0)n=n.splitText(s);
+  if(!n.nodeValue.length)continue;const m=document.createElement('mark');m.className=cls;n.parentNode.insertBefore(m,n);m.appendChild(n);out.push(m)}return out}
+function unwrap(m){const p=m.parentNode;if(!p)return;while(m.firstChild)p.insertBefore(m.firstChild,m);p.removeChild(m);p.normalize()}
+const menu=$('#hlmenu');let pending=null,target=null;
+function hideMenu(){menu.style.display='none';pending=null;target=null}
+function showMenu(x,y,canHl){$('#hlDo').style.display=canHl?'':'none';menu.style.display='flex';
+  const w=menu.offsetWidth;menu.style.left=Math.max(6,Math.min(innerWidth-w-6,x-w/2))+'px';menu.style.top=Math.max(60,y-44)+'px'}
+function checkSel(){const s=getSelection();if(!s.rangeCount||s.isCollapsed)return false;const r=s.getRangeAt(0);
+  const anc=r.commonAncestorContainer.nodeType===3?r.commonAncestorContainer.parentElement:r.commonAncestorContainer;
+  const zone=anc.closest('.hl-zone')||anc.querySelector&&anc.querySelector('.hl-zone')&&anc.closest('.part');if(!zone)return false;
+  pending=r.cloneRange();target=null;const b=r.getBoundingClientRect();showMenu(b.left+b.width/2,b.top,true);return true}
+document.addEventListener('mouseup',e=>{if(menu.contains(e.target))return;setTimeout(()=>{if(checkSel())return;
+  const m=e.target.closest&&e.target.closest('mark.hl');if(m){target=m;pending=null;const b=m.getBoundingClientRect();showMenu(b.left+b.width/2,b.top,false)}else hideMenu()},10)});
+document.addEventListener('touchend',e=>{if(menu.contains(e.target))return;setTimeout(checkSel,350)});
+menu.addEventListener('mousedown',e=>e.preventDefault());
+$('#hlDo').onclick=()=>{if(pending){const r=pending;const segs=textNodesIn(r.commonAncestorContainer.nodeType===3?r.commonAncestorContainer.parentNode:r.commonAncestorContainer,
+  n=>r.intersectsNode(n)&&n.parentElement.closest('.hl-zone')).map(n=>({node:n,s:n===r.startContainer?r.startOffset:0,e:n===r.endContainer?r.endOffset:n.length}));
+  wrapSeg(segs,'hl')}getSelection().removeAllRanges();hideMenu()};
+$('#hlClr').onclick=()=>{if(target)unwrap(target);else if(pending){$$('mark.hl').filter(m=>pending.intersectsNode(m)).forEach(unwrap)}getSelection().removeAllRanges();hideMenu()};
+document.addEventListener('scroll',hideMenu,true);
+
+/* ---------- locate (after submission) ---------- */
+function locate(q){if(!st.submitted)return;showPart(partOf(q));curQ=q;renderNav();
+  $$('mark.ev').forEach(unwrap);$$('.locating').forEach(x=>x.classList.remove('locating'));
+  const qe=document.getElementById('q'+q);if(qe)qe.classList.add('locating');
+  const root=document.querySelector(`#part${partOf(q)} .passage`),txt=dec(EV[q]);
+  const nodes=textNodesIn(root);let full='',map=[];for(const n of nodes){map.push([n,full.length]);full+=n.nodeValue}
+  const i=full.indexOf(txt);if(i<0)return;const j=i+txt.length;
+  const segs=map.filter(([n,o])=>o<j&&o+n.length>i).map(([n,o])=>({node:n,s:Math.max(0,i-o),e:Math.min(n.length,j-o)}));
+  const ms=wrapSeg(segs,'ev');if(ms[0]){ms[0].scrollIntoView({block:'center',behavior:'smooth'});ms.forEach(m=>m.classList.add('flash'))}}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.loc');if(b){e.preventDefault();locate(+b.dataset.q)}});
+
+/* ---------- fullscreen ---------- */
+const isFS=()=>!!(document.fullscreenElement||document.webkitFullscreenElement);
+const fsOK=()=>!!(document.fullscreenEnabled||document.webkitFullscreenEnabled);
+function goFS(){try{localStorage.setItem('fs_pref','1')}catch(e){}const el=document.documentElement;const f=el.requestFullscreen||el.webkitRequestFullscreen;if(f&&!isFS()){try{const p=f.call(el);if(p&&p.catch)p.catch(()=>{})}catch(e){}}}
+let running=false;
+function onFS(){if(!running||st.submitted)return;const last=st.fs[st.fs.length-1];
+  if(!isFS()){if(!last||last.s!=null)st.fs.push({t:Date.now(),s:null});$('#fsWarn').classList.add('on');save(true)}
+  else{if(last&&last.s==null)last.s=Math.round((Date.now()-last.t)/1000);$('#fsWarn').classList.remove('on');save(true)}}
+document.addEventListener('fullscreenchange',onFS);document.addEventListener('webkitfullscreenchange',onFS);
+$('#fsBack').onclick=()=>{goFS();setTimeout(()=>{if(!fsOK()){const l=st.fs[st.fs.length-1];if(l&&l.s==null)l.s=Math.round((Date.now()-l.t)/1000);$('#fsWarn').classList.remove('on')}},600)};
+function closeFsLog(){const l=st.fs[st.fs.length-1];if(l&&l.s==null)l.s=Math.round((Date.now()-l.t)/1000)}
+
+/* ---------- timer ---------- */
+let tick;
+function fmt(s){s=Math.max(0,s);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+function runTimer(){clearInterval(tick);const f=()=>{const r=Math.round((st.deadline-Date.now())/1000);$('#tleft').textContent=fmt(r);$('#clock').classList.toggle('warn',r<=300);if(r<=0){clearInterval(tick);submit(true)}};f();tick=setInterval(f,1000)}
+
+/* ---------- start / resume ---------- */
+function setWho(){$('#who').textContent=(st.name||'')+(st.cls?' · '+st.cls:'')}
+function begin(){$('#start').classList.remove('on');running=true;setWho();restoreInputs();showPart(st.part||1);runTimer();save(true);
+  if(fsOK()&&!isFS())setTimeout(()=>{if(!isFS())onFS()},800)}
+function initStart(){const ov=$('#start');ov.classList.add('on');const nm=$('#inName'),cl=$('#inCls');
+  if(canvasName){nm.value=canvasName;nm.readOnly=true}else if(st.name)nm.value=st.name;
+  try{cl.value=st.cls||localStorage.getItem('cls_last')||''}catch(e){}
+  if(st.startedAt){$('#startBtn').textContent='Tiếp tục làm bài';nm.readOnly=true;cl.readOnly=true}
+  $('#startBtn').onclick=()=>{const n=nm.value.trim(),c=cl.value.trim();
+    if(!n||!c){$('#startErr').textContent='Con điền đầy đủ họ tên và lớp nhé.';return}
+    st.name=n;st.cls=c;try{localStorage.setItem('cls_last',c)}catch(e){}
+    if(!st.startedAt){st.startedAt=Date.now();st.deadline=st.startedAt+CFG.DURATION_MIN*60000;st.id=(Date.now().toString(36)+Math.random().toString(36).slice(2,8)).toUpperCase()}
+    goFS();if(Date.now()>=st.deadline){running=true;setWho();restoreInputs();submit(true);return}begin()}}
+
+/* ---------- submit ---------- */
+$('#subBtn').onclick=()=>{let u=0;for(let q=1;q<=40;q++)if(!answered(q))u++;
+  $('#cfMsg').innerHTML=u?`Con còn <b>${u}</b> câu chưa làm. Sau khi nộp con sẽ không sửa được bài nữa.`:'Con đã làm đủ 40 câu. Sau khi nộp con sẽ không sửa được bài nữa.';$('#confirm').classList.add('on')};
+$('#cfNo').onclick=()=>$('#confirm').classList.remove('on');
+$('#cfYes').onclick=()=>{$('#confirm').classList.remove('on');submit(false)};
+function submit(auto){if(st.submitted)return;closeFsLog();running=false;clearInterval(tick);
+  st.res=grade();st.submitted=true;st.subAt=Date.now();st.auto=!!auto;st.sent=false;
+  $('#fsWarn').classList.remove('on');save(true);SC.report(st.res.score,40);
+  enterReview(true);send()}
+function hms(t){const d=new Date(t);return d.toLocaleTimeString('vi-VN',{hour12:false})}
+function send(){const el=$('#sendSt');
+  if(!/^https:\/\/script\.google/.test(CFG.WEB_APP_URL)){el.className='sendst bad';el.textContent='Chưa cài đặt địa chỉ nhận bài.';return}
+  const fsDone=st.fs.filter(x=>x.s!=null);
+  const payload={id:st.id,testId:CFG.TEST_ID,testName:CFG.TEST_NAME,name:st.name,cls:st.cls,canvasId:canvasId,
+    answers:Array.from({length:40},(_,i)=>st.a[i+1]||''),score:st.res.score,band:st.res.band,parts:st.res.parts,
+    startedAt:new Date(st.startedAt).toISOString(),submittedAt:new Date(st.subAt).toISOString(),
+    durationSec:Math.round((st.subAt-st.startedAt)/1000),auto:st.auto,
+    fsCount:st.fs.length,fsTotalSec:fsDone.reduce((a,x)=>a+x.s,0),fsDetail:st.fs.map(x=>hms(x.t)+' ('+(x.s==null?'?':x.s)+'s)').join('; ')};
+  el.className='sendst';el.textContent='Đang gửi bài cho Thầy Độ...';
+  fetch(CFG.WEB_APP_URL,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)})
+    .then(()=>{st.sent=true;save(true);el.className='sendst ok';el.textContent='Đã gửi bài cho Thầy Độ.'})
+    .catch(()=>{el.className='sendst bad';el.innerHTML='Chưa gửi được bài (mất mạng?). <button id="resend">Gửi lại</button>';$('#resend').onclick=send})}
+
+/* ---------- review ---------- */
+function enterReview(showModal){document.body.classList.add('review');setWho();restoreInputs();
+  $$('.gin').forEach(i=>i.readOnly=true);$$('.q input[type=radio]').forEach(i=>i.tabIndex=-1);
+  const r=st.res;
+  for(let q=1;q<=40;q++){const ok=!!r.marks[q];$$(`.mk[data-q="${q}"]`).forEach(m=>{m.textContent=ok?'✓':'✗';m.className='mk '+(ok?'ok':'no')});
+    const g=document.querySelector(`.gin[data-q="${q}"]`);if(g)g.classList.add(ok?'ok':'no');
+    const z=document.querySelector(`.dz[data-q="${q}"]`);if(z)z.classList.add(ok?'ok':'no')}
+  $('#sbScore').textContent=r.score+'/40';$('#sbBand').textContent='Band '+r.band.toFixed(1);
+  $('#rScore').textContent=r.score+'/40';$('#rBand').textContent='Band '+r.band.toFixed(1)+(st.auto?' · hết giờ, bài tự nộp':'');
+  $('#rp1').textContent=r.parts[0]+'/13';$('#rp2').textContent=r.parts[1]+'/13';$('#rp3').textContent=r.parts[2]+'/14';
+  showPart(1);curQ=1;renderNav();
+  if(showModal)$('#result').classList.add('on');
+  if(st.sent){$('#sendSt').className='sendst ok';$('#sendSt').textContent='Đã gửi bài cho Thầy Độ.'}}
+$('#rClose').onclick=()=>$('#result').classList.remove('on');
+function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(e._t);e._t=setTimeout(()=>e.style.display='none',2200)}
+
+/* ---------- boot ---------- */
+renderDrops();showPart(1);
+if(st.submitted){enterReview(false);if(!st.sent)send()}
+else initStart();
+</script>
+</body>
+</html>
