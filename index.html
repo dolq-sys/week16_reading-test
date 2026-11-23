@@ -21,6 +21,8 @@ header{height:54px;flex:none;display:flex;align-items:center;justify-content:spa
 .scorebar{display:none;font-weight:700}
 body.review .clock{display:none}
 body.review .scorebar{display:flex;gap:14px;align-items:center}
+.redo{border:1px solid #1a5fb4;background:#fff;color:#1a5fb4;border-radius:6px;padding:5px 12px;font-weight:700;font-size:14px}
+.redo:hover{background:#1a5fb4;color:#fff}
 .scorebar .pill{background:#e8f0fe;color:var(--blue);border-radius:20px;padding:4px 12px}
 /* parts */
 main{flex:1;min-height:0;position:relative}
@@ -157,7 +159,7 @@ body.review .subbtn{display:none}
 <header>
   <div class="brand"><span class="tag">IELTS</span><span>Reading</span><span class="tt">· Week 16 · Full Test (2)</span></div>
   <div class="clock" id="clock"><svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 9v4l3 2M9 3h6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg><span id="tleft">60:00</span></div>
-  <div class="scorebar"><span class="pill" id="sbScore"></span><span id="sbBand"></span></div>
+  <div class="scorebar"><span class="pill" id="sbScore"></span><span id="sbBand"></span><button class="redo" id="redoTop">Làm lại bài</button></div>
   <div class="who" id="who"></div>
 </header>
 <main>
@@ -315,7 +317,7 @@ body.review .subbtn{display:none}
   <div class="pp"><div>Part 1<b id="rp1"></b></div><div>Part 2<b id="rp2"></b></div><div>Part 3<b id="rp3"></b></div></div>
   <div class="note">Thầy Độ không công bố đáp án. Khi xem lại, câu đúng có dấu <b style="color:#1e8e3e">✓</b>, câu sai có dấu <b style="color:#d93025">✗</b>. Con bấm <b>kính lúp</b> cạnh mỗi câu để xem thông tin trả lời nằm ở đâu trong bài đọc, rồi tự tìm lại đáp án đúng nhé.</div>
   <p class="sendst" id="sendSt"></p>
-  <button class="big" id="rClose">Xem lại bài</button>
+  <div class="row2"><button class="big gray" id="redoRes">Làm lại bài</button><button class="big" id="rClose">Xem lại bài</button></div>
 </div></div>
 
 <script>
@@ -494,7 +496,7 @@ function runTimer(){clearInterval(tick);const f=()=>{const r=Math.round((st.dead
 function setWho(){$('#who').textContent=(st.name||'')+(st.cls?' · '+st.cls:'')}
 function begin(){$('#start').classList.remove('on');running=true;setWho();restoreInputs();showPart(st.part||1);runTimer();save(true);
   if(fsOK()&&!isFS())setTimeout(()=>{if(!isFS())onFS()},800)}
-function initStart(){const ov=$('#start');ov.classList.add('on');const nm=$('#inName'),cl=$('#inCls');
+function initStart(){const ov=$('#start');ov.classList.add('on');if((st.attempt||1)>1)$('.card .sub').textContent='IELTS Academic Reading · 3 passages · 40 questions · 60 minutes · Lần làm thứ '+st.attempt;const nm=$('#inName'),cl=$('#inCls');
   if(canvasName){nm.value=canvasName;nm.readOnly=true}else if(st.name)nm.value=st.name;
   try{cl.value=st.cls||localStorage.getItem('cls_last')||''}catch(e){}
   if(st.startedAt){$('#startBtn').textContent='Tiếp tục làm bài';nm.readOnly=true;cl.readOnly=true}
@@ -520,7 +522,7 @@ function send(){const el=$('#sendSt');
   const payload={id:st.id,testId:CFG.TEST_ID,testName:CFG.TEST_NAME,name:st.name,cls:st.cls,canvasId:canvasId,
     answers:Array.from({length:40},(_,i)=>st.a[i+1]||''),score:st.res.score,band:st.res.band,parts:st.res.parts,
     startedAt:new Date(st.startedAt).toISOString(),submittedAt:new Date(st.subAt).toISOString(),
-    durationSec:Math.round((st.subAt-st.startedAt)/1000),auto:st.auto,
+    durationSec:Math.round((st.subAt-st.startedAt)/1000),auto:st.auto,attempt:st.attempt||1,
     fsCount:st.fs.length,fsTotalSec:fsDone.reduce((a,x)=>a+x.s,0),fsDetail:st.fs.map(x=>hms(x.t)+' ('+(x.s==null?'?':x.s)+'s)').join('; ')};
   el.className='sendst';el.textContent='Đang gửi bài cho Thầy Độ...';
   fetch(CFG.WEB_APP_URL,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)})
@@ -535,12 +537,24 @@ function enterReview(showModal){document.body.classList.add('review');setWho();r
     const g=document.querySelector(`.gin[data-q="${q}"]`);if(g)g.classList.add(ok?'ok':'no');
     const z=document.querySelector(`.dz[data-q="${q}"]`);if(z)z.classList.add(ok?'ok':'no')}
   $('#sbScore').textContent=r.score+'/40';$('#sbBand').textContent='Band '+r.band.toFixed(1);
-  $('#rScore').textContent=r.score+'/40';$('#rBand').textContent='Band '+r.band.toFixed(1)+(st.auto?' · hết giờ, bài tự nộp':'');
+  $('#rScore').textContent=r.score+'/40';$('#result h1').textContent='Kết quả bài làm · Lần '+(st.attempt||1);$('#rBand').textContent='Band '+r.band.toFixed(1)+(st.auto?' · hết giờ, bài tự nộp':'');
   $('#rp1').textContent=r.parts[0]+'/13';$('#rp2').textContent=r.parts[1]+'/13';$('#rp3').textContent=r.parts[2]+'/14';
   showPart(1);curQ=1;renderNav();
   if(showModal)$('#result').classList.add('on');
   if(st.sent){$('#sendSt').className='sendst ok';$('#sendSt').textContent='Đã gửi bài cho Thầy Độ.'}}
 $('#rClose').onclick=()=>$('#result').classList.remove('on');
+function redo(){
+  st={t:CFG.TEST_ID,a:{},fs:[],part:1,name:st.name,cls:st.cls,attempt:(st.attempt||1)+1};save(true);
+  document.body.classList.remove('review');$('#result').classList.remove('on');
+  $$('mark.ev,mark.hl').forEach(unwrap);$$('.locating').forEach(x=>x.classList.remove('locating'));
+  $$('.mk').forEach(m=>{m.textContent='';m.className='mk'});
+  $$('.gin').forEach(g=>{g.value='';g.readOnly=false;g.classList.remove('ok','no')});
+  $$('.dz').forEach(z=>z.classList.remove('ok','no'));
+  $$('.q input[type=radio]').forEach(i=>{i.checked=false;i.tabIndex=0});
+  renderDrops();curQ=1;showPart(1);$$('.pane').forEach(p=>p.scrollTop=0);
+  $('#tleft').textContent=fmt(CFG.DURATION_MIN*60);$('#clock').classList.remove('warn');
+  $('#startBtn').textContent='Bắt đầu làm bài';$('#startErr').textContent='';initStart();}
+$('#redoTop').onclick=redo;$('#redoRes').onclick=redo;
 function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(e._t);e._t=setTimeout(()=>e.style.display='none',2200)}
 
 /* ---------- boot ---------- */
