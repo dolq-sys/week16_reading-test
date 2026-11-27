@@ -730,8 +730,10 @@ function remainMs(n){return PDUR-(st.tu[n]||0)-(st.rs&&st.ph==='while'&&n===st.c
 function pauseTimer(){if(st.rs){st.tu[st.cur]=(st.tu[st.cur]||0)+Date.now()-st.rs;st.rs=null}}
 function resumeTimer(){if(!st.rs)st.rs=Date.now()}
 function runTimer(){clearInterval(tick);const f=()=>{const live=st.ph==='while'&&!!st.rs;const r=remainMs(st.cur)/1000;
-    $('#tleft').textContent=fmt(r);$('#tpart').textContent='Passage '+st.cur;$('#clock').classList.toggle('warn',live&&r<=180);$('#clock').classList.toggle('paused',!live);
-    if(live&&r<=0){clearInterval(tick);checkPassage(true)}};f();tick=setInterval(f,1000)}
+    $('#tleft').textContent=r>=0?fmt(r):'+'+fmt(-r);$('#tpart').textContent='Passage '+st.cur+(r<0?' · over time':'');
+    $('#clock').classList.toggle('warn',live&&r<=180);$('#clock').classList.toggle('paused',!live);
+    // no auto-submit: when time is up, students keep going and click Check themselves
+    if(live&&r<=0&&!st.auto[st.cur]){st.auto[st.cur]=1;save(true);SFX.bell();toast("Time is up! Finish your answers and click Check when you are ready.")}};f();tick=setInterval(f,1000)}
 
 /* ================= START ================= */
 function setWho(){$('#who').textContent=(st.name||'')+(st.cls?' · '+st.cls:'')}
@@ -824,7 +826,7 @@ function checkPassage(auto){const n=st.cur;if(st.ck[n])return;pauseTimer();clear
   const sc=partScore(n),tot=qsOf(n).length;st.ck[n]={s:sc,t:tot};if(auto)st.auto[n]=1;st.ph='post';save(true);
   markPart(n);renderNav();updFoot();runTimer();
   $('#ckTitle').textContent='Passage '+n+' · Result';$('#ckScore').textContent=sc+'/'+tot;
-  $('#ckNote').innerHTML=(auto?'<b>Time is up.</b> ':'')+'Correct answers are marked <b style="color:#1e8e3e">✓</b> and wrong answers <b style="color:#d93025">✗</b>. The answers are not shown. Click the <b>magnifier</b> next to a question to see where the information is in the passage, then find the correct answer yourself.';
+  $('#ckNote').innerHTML='Correct answers are marked <b style="color:#1e8e3e">✓</b> and wrong answers <b style="color:#d93025">✗</b>. The answers are not shown. Click the <b>magnifier</b> next to a question to see where the information is in the passage, then find the correct answer yourself.';
   $('#ckm').classList.add('on');sc>=tot*.7?SFX.win():SFX.ting()}
 $('#ckReview').onclick=()=>$('#ckm').classList.remove('on');
 $('#ckPost').onclick=()=>{$('#ckm').classList.remove('on');openPost(st.cur)};
@@ -943,7 +945,7 @@ function send(){const el=$('#sendSt');
     answers:Array.from({length:40},(_,i)=>st.a[i+1]||''),score:st.res.score,band:st.res.band,parts:st.res.parts,
     startedAt:new Date(st.startedAt).toISOString(),submittedAt:new Date(st.subAt).toISOString(),
     durationSec:Math.round([1,2,3].reduce((a,n)=>a+(st.tu[n]||0),0)/1000),totalSec:Math.round((st.subAt-st.startedAt)/1000),
-    auto:Object.keys(st.auto).length>0,autoParts:Object.keys(st.auto).map(n=>'P'+n).join(' '),attempt:st.attempt||1,gram:gr,
+    auto:false,autoParts:Object.keys(st.auto).map(n=>'P'+n+' +'+fmt(Math.max(0,((st.tu[n]||0)-PDUR)/1000))).join(' '),attempt:st.attempt||1,gram:gr,
     fsCount:st.fs.length,fsTotalSec:fsDone.reduce((a,x)=>a+x.s,0),fsDetail:st.fs.map(x=>hms(x.t)+(x.k==='tab'?' tab':'')+' ('+(x.s==null?'?':x.s)+'s)').join('; ')};
   el.className='sendst';el.textContent='Sending to Thầy Độ...';
   fetch(CFG.WEB_APP_URL,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)})
